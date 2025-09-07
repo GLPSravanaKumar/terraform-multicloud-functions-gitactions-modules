@@ -72,7 +72,7 @@ output "aws_instance_id" {
 }
 output "public_server_ip" {
   description = "list of instace public server Ids"
-  value       = module.aws_ec2.public_server_ip
+  value       = concat(module.aws_ec2.public_server_ip, module.aws_ec2_1.public_server_ip)
 }
 output "s3_bucket_arn" {
   description = "aws s3 bucket access resource name"
@@ -84,5 +84,21 @@ output "s3_bucket_domain_name" {
 }
 output "private_server_ip" {
   description = "list of instace private server Ids"
-  value       = module.aws_ec2.private_server_ip
+  value       = concat(module.aws_ec2.private_server_ip, module.aws_ec2_1.private_server_ip)
+}
+#OR
+/* output "private_server_ips" {
+  description = "Private server IPs grouped by module"
+  value = {
+    ec2  = module.aws_ec2.private_server_ip
+    ec2_1 = module.aws_ec2_1.private_server_ip
+  }
+} */
+
+output "igw_id" {
+  description = "internet gateway Id"
+  value       = module.aws_igw.igw_id
+}
+output "peering_id" {
+  value = module.aws_vpc_peering.peering_id
 }

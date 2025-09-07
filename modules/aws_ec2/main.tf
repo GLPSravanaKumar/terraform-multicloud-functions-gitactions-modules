@@ -8,7 +8,7 @@ resource "aws_instance" "public_servers" {
   vpc_security_group_ids      = [var.pub_sg_id]
   user_data                   = var.user_data
   tags = {
-    Name = "public_webserver-${count.index + 1}"
+    Name = "${var.department}-public_webserver-${count.index + 1}"
   }
 }
 
@@ -22,6 +22,6 @@ resource "aws_instance" "private_servers" {
   vpc_security_group_ids      = [var.private_sg_id]
   user_data                   = var.user_data
   tags = {
-    Name = "private_webserver-${count.index + 1}"
+    Name = "${var.department}-private_webserver-${count.index + 1}"
   }
 }

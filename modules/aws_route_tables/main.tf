@@ -1,20 +1,12 @@
-resource "aws_internet_gateway" "igw" {
-  vpc_id = var.vpc_id
-
-  tags = {
-    Name = "internet-gateway"
-  }
-}
-
 resource "aws_route_table" "public_rt" {
   vpc_id = var.vpc_id
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.igw.id
+    gateway_id = var.igw_id
   }
   tags = {
-    name = "public-rt"
+    Name = "${var.department}-public-rt"
   }
   depends_on = [var.public_subnet_ids]
 }
@@ -23,7 +15,7 @@ resource "aws_eip" "eip" {
   count  = length(var.public_subnet_cidrs)
   domain = "vpc"
   tags = {
-    Name = "Eip"
+    Name = "${var.department}-Eip"
   }
 }
 resource "aws_nat_gateway" "nat_gw" {
@@ -32,9 +24,9 @@ resource "aws_nat_gateway" "nat_gw" {
   subnet_id     = element(var.public_subnet_ids, count.index)
 
   tags = {
-    Name = "Nat-Gw"
+    Name = "${var.department}-Nat-Gw"
   }
-  depends_on = [aws_internet_gateway.igw, var.public_subnet_ids]
+  depends_on = [var.igw_id, var.public_subnet_ids]
 }
 
 resource "aws_route_table_association" "public_rt_association" {
@@ -51,7 +43,7 @@ resource "aws_route_table" "private_rt" {
   }
 
   tags = {
-    name = "private-rt"
+    Name = "${var.department}-private-rt"
   }
   depends_on = [var.private_subnet_ids]
 }

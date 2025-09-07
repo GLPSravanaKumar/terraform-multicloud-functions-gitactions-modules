@@ -31,7 +31,6 @@ variable "bucket_name" {
   description = "Name of the storage bucket"
 }
 
-
 variable "public_subnet_cidrs" {
   description = "List of CIDR blocks for public subnets"
   type        = list(string)
@@ -53,3 +52,8 @@ variable "ami" {
 variable "department" {
   description = "value of department tag"
 }
+/* variable "igw_id" {
+  description = "internet gateway Id"
+  type        = string
+}
+ */

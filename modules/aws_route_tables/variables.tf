@@ -13,3 +13,9 @@ variable "public_subnet_cidrs" {
 variable "private_subnet_cidrs" {
   description = "List of CIDR blocks for private subnets"
 }
+variable "department" {
+  description = "value of department tag"
+}
+variable "igw_id" {
+  description = "internet gateway Id"
+}

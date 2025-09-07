@@ -1,0 +1,137 @@
+{
+  "ami_image_id": {
+    "sensitive": false,
+    "type": [
+      "tuple",
+      [
+        "string"
+      ]
+    ],
+    "value": [
+      "ami-0360c520857e3138f"
+    ]
+  },
+  "aws_instance_id": {
+    "sensitive": false,
+    "type": [
+      "tuple",
+      [
+        "string"
+      ]
+    ],
+    "value": [
+      "i-09bf9763b4e26d6d8"
+    ]
+  },
+  "igw_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "igw-098aa998767d555b5"
+  },
+  "nat_gw_ids": {
+    "sensitive": false,
+    "type": [
+      "tuple",
+      [
+        "string"
+      ]
+    ],
+    "value": [
+      "nat-0e6934d9e5580f1fd"
+    ]
+  },
+  "private_route_table_ids": {
+    "sensitive": false,
+    "type": [
+      "tuple",
+      [
+        "string"
+      ]
+    ],
+    "value": [
+      "rtb-0501a384dfebafe27"
+    ]
+  },
+  "private_server_ip": {
+    "sensitive": false,
+    "type": [
+      "tuple",
+      []
+    ],
+    "value": []
+  },
+  "private_sg_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "sg-0f73afe1a3c439c25"
+  },
+  "private_subnet_ids": {
+    "sensitive": false,
+    "type": [
+      "tuple",
+      []
+    ],
+    "value": []
+  },
+  "pub_sg_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "sg-01e5a36984e0282f8"
+  },
+  "public_route_table_ids": {
+    "sensitive": false,
+    "type": [
+      "tuple",
+      [
+        "string"
+      ]
+    ],
+    "value": [
+      "rtb-0d94ae0c40e79d7e6"
+    ]
+  },
+  "public_server_ip": {
+    "sensitive": false,
+    "type": [
+      "tuple",
+      [
+        "string"
+      ]
+    ],
+    "value": [
+      "54.221.187.17"
+    ]
+  },
+  "public_subnet_ids": {
+    "sensitive": false,
+    "type": [
+      "tuple",
+      [
+        "string"
+      ]
+    ],
+    "value": [
+      "subnet-0cf1d2639df5ee71f"
+    ]
+  },
+  "s3_bucket_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:s3:::uhg-s3-backend-table"
+  },
+  "s3_bucket_domain_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "uhg-s3-backend-table.s3.amazonaws.com"
+  },
+  "vpc_cidr_block": {
+    "sensitive": false,
+    "type": "string",
+    "value": "10.0.0.0/16"
+  },
+  "vpc_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "vpc-0c0a410fd592e29d8"
+  }
+}

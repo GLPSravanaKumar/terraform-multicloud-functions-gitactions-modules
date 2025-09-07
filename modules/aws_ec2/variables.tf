@@ -8,6 +8,9 @@ variable "public_subnet_ids" {
 variable "pub_sg_id" {
   description = "value of public security group id"
 }
+variable "private_sg_id" {
+  description = "value of public security group id"
+}
 variable "public_subnet_cidrs" {
   description = "public subnet cidr values"
 }
@@ -18,9 +21,6 @@ variable "private_subnet_ids" {
   description = "List of private subnet IDs"
   type        = list(string)
 }
-variable "private_sg_id" {
-  description = "value of private security group id"
-}
 variable "private_subnet_cidrs" {
   description = "private subnet cidr values"
 }
@@ -29,4 +29,7 @@ variable "key_name" {
 }
 variable "user_data" {
   description = "user data to attaced to instances"
+}
+variable "department" {
+  description = "value of department tag"
 }

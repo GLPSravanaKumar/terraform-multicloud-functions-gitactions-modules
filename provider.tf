@@ -23,12 +23,12 @@ provider "mongodbatlas" {
 }
 
 provider "aws" {
-  region = "us-east-1"
-  #  profile = "optum"
+  region  = "us-east-1"
+  profile = "optum"
   default_tags {
     tags = {
-      Environment = "Testing"
-      Cient       = upper("uhg")
+      Environment = "Dev"
+      Cient       = upper("optum")
     }
   }
 }

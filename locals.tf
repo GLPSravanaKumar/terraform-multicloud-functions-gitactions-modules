@@ -73,4 +73,5 @@ locals {
     </html>" > /var/www/html/index.html
     EOT
   }
+
 }

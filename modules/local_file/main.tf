@@ -22,5 +22,5 @@ resource "local_file" "ansible_inventory_file" {
       private_servers = var.private_server_ip
     }
   )
-  filename = "${path.root}/ansible_inventory_file"
+  filename = "${path.root}/ansible_inventory_file.ini"
 }
