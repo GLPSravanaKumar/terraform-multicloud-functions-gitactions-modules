@@ -28,4 +28,4 @@ if [[ "$HOSTNAME" == *"public"* ]]; then
 else
   sudo hostnamectl set-hostname private-server-${INDEX}
 fi
-
+ansible -i ansible_inventory_file.ini all -m ping --yes

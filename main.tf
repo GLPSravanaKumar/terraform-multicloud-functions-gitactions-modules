@@ -122,8 +122,8 @@ module "aws_ec2_1" {
 }
 module "local_file" {
   source            = "./modules/local_file"
-  public_server_ip  = module.aws_ec2.public_server_ip
-  private_server_ip = module.aws_ec2.private_server_ip
+  public_server_ip  = concat(module.aws_ec2.public_server_ip, module.aws_ec2_1.public_server_ip)
+  private_server_ip = concat(module.aws_ec2.private_server_ip, module.aws_ec2_1.private_server_ip)
 }
 
 
