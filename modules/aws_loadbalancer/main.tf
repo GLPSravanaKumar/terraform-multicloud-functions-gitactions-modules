@@ -2,7 +2,7 @@ resource "aws_lb_target_group" "alb_target_gp" {
   name        = "${var.department}-alb-tg"
   target_type = "alb"
   port        = 80
-  protocol    = "TCP"
+  protocol    = "HTTP"
   vpc_id      = var.vpc_id
 }
 resource "aws_lb" "alb" {
@@ -10,7 +10,7 @@ resource "aws_lb" "alb" {
   internal           = false
   load_balancer_type = var.lb_type
   security_groups    = [var.alb_sg_id]
-  subnets            = concat(var.public_subnet_ids, var.private_subnet_ids)
+  subnets            = var.public_subnet_ids
   access_logs {
     bucket  = var.bucket_name
     prefix  = "${var.department}-alb-logs"
