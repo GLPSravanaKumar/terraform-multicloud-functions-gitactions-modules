@@ -46,14 +46,29 @@ variable "vpc_cidr_block" {
 variable "instance_type" {
   description = "Type of EC2 instance"
 }
-variable "ami" {
-  description = "Type of instance Ami "
-}
+
 variable "department" {
   description = "value of department tag"
 }
 /* variable "igw_id" {
   description = "internet gateway Id"
   type        = string
+} */
+variable "ami" {
+  description = "Type of instance Ami "
+}
+/* variable "dev_public_subnet_cidrs" {
+  description = "dev public subnet cidr values"
+}
+
+variable "test_public_subnet_cidrs" {
+  description = "test public subnet cidr values"
+}
+
+variable "qa_public_subnet_cidrs" {
+  description = "qa public subnet cidr values"
 }
  */
+variable "lb_type" {
+  description = "lb type: ALB, NLB,GLB"
+}

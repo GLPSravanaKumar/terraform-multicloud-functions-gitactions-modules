@@ -64,15 +64,27 @@ output "nat_gw_ids" {
 }
 output "ami_image_id" {
   description = "launched instance Ami image ID"
-  value       = module.aws_ec2.ami_image_id
+  value       = module.aws_ec2_ansible-controller.ami_image_id
 }
-output "aws_instance_id" {
+/* output "aws_instance_id" {
   description = "list of active running instance  Ids"
-  value       = module.aws_ec2.aws_instance_id
+  value = concat(module.aws_ec2_ansible-controller.aws_instance_id,
+    module.aws_ec2_dev.aws_instance_id,
+  module.aws_ec2_test.aws_instance_id, module.aws_ec2_qa.aws_instance_id)
 }
 output "public_server_ip" {
   description = "list of instace public server Ids"
-  value       = concat(module.aws_ec2.public_server_ip, module.aws_ec2_1.public_server_ip)
+  value = concat(module.aws_ec2_ansible-controller.public_server_ip,
+    module.aws_ec2_dev.public_server_ip, module.aws_ec2_test.public_server_ip,
+  module.aws_ec2_qa.public_server_ip)
+} */
+output "aws_instance_ids" {
+  description = "list of active running instance  Ids"
+  value       = concat(module.aws_ec2_ansible-controller.aws_instance_ids)
+}
+output "public_server_ip" {
+  description = "list of instace public server Ids"
+  value       = concat(module.aws_ec2_ansible-controller.public_server_ip)
 }
 output "s3_bucket_arn" {
   description = "aws s3 bucket access resource name"
@@ -82,23 +94,34 @@ output "s3_bucket_domain_name" {
   description = "Name of the s3 bucket"
   value       = module.aws_s3_bucket.s3_bucket_domain_name
 }
-output "private_server_ip" {
+/* output "private_server_ip" {
   description = "list of instace private server Ids"
-  value       = concat(module.aws_ec2.private_server_ip, module.aws_ec2_1.private_server_ip)
+  value = concat(module.aws_ec2_ansible-controller.private_server_ip,
+    module.aws_ec2_dev.private_server_ip, module.aws_ec2_test.private_server_ip,
+  module.aws_ec2_qa.private_server_ip)
 }
 #OR
-/* output "private_server_ips" {
+output "private_server_ips" {
   description = "Private server IPs grouped by module"
   value = {
     ec2  = module.aws_ec2.private_server_ip
     ec2_1 = module.aws_ec2_1.private_server_ip
   }
 } */
-
+output "private_server_ip" {
+  description = "list of instace private server Ids"
+  value       = concat(module.aws_ec2_ansible-controller.private_server_ip)
+}
 output "igw_id" {
   description = "internet gateway Id"
   value       = module.aws_igw.igw_id
 }
-output "peering_id" {
+/* output "peering_id" {
   value = module.aws_vpc_peering.peering_id
+} */
+output "lb_dns_name" {
+  value = module.aws_loadbalancer.lb_dns_name
+}
+output "alb_sg_id" {
+  value = module.aws_security_groups.alb_sg_id
 }

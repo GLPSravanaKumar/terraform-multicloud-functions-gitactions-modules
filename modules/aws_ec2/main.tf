@@ -9,6 +9,7 @@ resource "aws_instance" "public_servers" {
   user_data                   = var.user_data
   tags = {
     Name = "${var.department}-public_webserver-${count.index + 1}"
+    Role = var.department == "Ansible-Controller" ? "controller" : var.department == "Dev" ? "dev" : var.department == "Test" ? "test" : "unknown"
   }
 }
 
@@ -23,5 +24,6 @@ resource "aws_instance" "private_servers" {
   user_data                   = var.user_data
   tags = {
     Name = "${var.department}-private_webserver-${count.index + 1}"
+    Role = var.department == "Ansible-Controller" ? "controller" : var.department == "Dev" ? "dev" : var.department == "Test" ? "test" : "unknown"
   }
 }

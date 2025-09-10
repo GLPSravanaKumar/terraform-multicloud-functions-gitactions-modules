@@ -21,11 +21,11 @@ sudo apt install software-properties-common
 sudo add-apt-repository --yes --update ppa:ansible/ansible
 sudo apt install ansible -y
 sudo apt update && sudo apt upgrade -y
-INDEX=$1
 
+INDEX=$(( ${count_index} + 1 ))
 if [[ "$HOSTNAME" == *"public"* ]]; then
   sudo hostnamectl set-hostname public-server-${INDEX}
 else
   sudo hostnamectl set-hostname private-server-${INDEX}
 fi
-ansible -i ansible_inventory_file.ini all -m ping --yes
+

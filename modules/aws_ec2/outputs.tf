@@ -7,7 +7,7 @@ output "ami_image_id" {
   description = "Get instance Ami image ID"
   value       = aws_instance.public_servers[*].ami
 }
-output "aws_instance_id" {
+output "aws_instance_ids" {
   description = "Get list of active running instance  Ids"
   value       = aws_instance.public_servers[*].id
 }
