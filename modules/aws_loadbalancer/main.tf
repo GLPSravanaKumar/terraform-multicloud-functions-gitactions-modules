@@ -26,12 +26,12 @@ resource "aws_lb" "alb" {
     enabled = true
   }
 }
-/* resource "aws_lb_target_group_attachment" "alb_attachment" {
+resource "aws_lb_target_group_attachment" "alb_attachment" {
   count            = length(var.aws_instance_ids)
   target_group_arn = aws_lb_target_group.alb_target_gp.arn
   target_id        = var.aws_instance_ids[count.index]
   port             = 80
-} */
+}
 resource "aws_lb_listener" "alb_listner" {
   load_balancer_arn = aws_lb.alb.arn
   port              = 80
