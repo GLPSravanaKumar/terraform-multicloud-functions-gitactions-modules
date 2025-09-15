@@ -1,0 +1,4 @@
+packages_to_install:
+  - openjdk-21-jdk
+  - unzip
+  - iproute2

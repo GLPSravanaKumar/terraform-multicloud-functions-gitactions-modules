@@ -1,4 +1,4 @@
-resource "aws_launch_template" "lt" {
+/* resource "aws_launch_template" "lt" {
   name = "${var.department}-lt"
   block_device_mappings {
     device_name = "/dev/sdf"
@@ -13,10 +13,10 @@ resource "aws_launch_template" "lt" {
   iam_instance_profile {
     name = var.instance_profile_role
   }
-  image_id = var.ami
+  image_id                             = var.ami
   instance_initiated_shutdown_behavior = "terminate"
-  instance_type = var.instance_type
-  key_name = var.key_name
+  instance_type                        = var.instance_type
+  key_name                             = var.key_name
   metadata_options {
     http_endpoint               = "enabled"
     http_tokens                 = "required"
@@ -29,7 +29,7 @@ resource "aws_launch_template" "lt" {
   network_interfaces {
     associate_public_ip_address = true
   }
-  vpc_security_group_ids = var.pub_sg_id
+  vpc_security_group_ids = [var.pub_sg_id]
   tag_specifications {
     resource_type = "instance"
     tags = {
@@ -38,3 +38,4 @@ resource "aws_launch_template" "lt" {
   }
   user_data = var.user_data
 }
+ */

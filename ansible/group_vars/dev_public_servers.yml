@@ -1,0 +1,5 @@
+packages_to_install:
+  - openjdk-17-jdk
+  - git
+  - tree
+  - docker.io

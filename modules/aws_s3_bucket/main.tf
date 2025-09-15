@@ -14,6 +14,7 @@ resource "aws_s3_bucket_policy" "policy_attachment" {
 
 data "aws_iam_policy_document" "bucket_policy" {
   statement {
+    sid = "AllowSpecificAccount"
     principals {
       type        = "AWS"
       identifiers = ["593793035673"]

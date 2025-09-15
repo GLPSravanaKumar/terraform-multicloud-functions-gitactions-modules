@@ -20,11 +20,6 @@ resource "aws_lb" "alb" {
   load_balancer_type = var.lb_type
   security_groups    = [var.alb_sg_id]
   subnets            = var.public_subnet_ids
-  access_logs {
-    bucket  = var.bucket_name
-    prefix  = "${var.department}-alb-logs"
-    enabled = true
-  }
 }
 resource "aws_lb_target_group_attachment" "alb_attachment" {
   count            = length(var.aws_instance_ids)

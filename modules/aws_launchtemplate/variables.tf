@@ -1,4 +1,4 @@
-variable "department" {
+/* variable "department" {
   description = "value of department tag"
 }
 variable "ami" {
@@ -19,3 +19,4 @@ variable "instance_profile_role" {
 variable "user_data" {
   description = "user data to attaced to instances"
 }
+ */

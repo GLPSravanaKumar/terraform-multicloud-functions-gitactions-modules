@@ -37,33 +37,6 @@ module "aws_igw1" {
   source     = "./modules/aws_igw"
   vpc_id     = module.aws_vpc1.vpc_id
   department = title("optum")
-} 
-module "aws_subnets_dev" {
-  source = "./modules/aws_subnets"
-  #distinct: takes a list and returns a new list with any duplicate elements removed.
-  public_subnet_cidrs  = distinct(var.dev_public_subnet_cidrs)
-  private_subnet_cidrs = distinct([])
-  vpc_id               = module.aws_vpc1.vpc_id
-  #title: converts the first letter of each word in the given string to uppercase.
-  department = title("optum_dev")
-}
-module "aws_subnets_test" {
-  source = "./modules/aws_subnets"
-  #distinct: takes a list and returns a new list with any duplicate elements removed.
-  public_subnet_cidrs  = distinct(var.test_public_subnet_cidrs)
-  private_subnet_cidrs = distinct([])
-  vpc_id               = module.aws_vpc1.vpc_id
-  #title: converts the first letter of each word in the given string to uppercase.
-  department = title("optum_test")
-}
-module "aws_subnets_qa" {
-  source = "./modules/aws_subnets"
-  #distinct: takes a list and returns a new list with any duplicate elements removed.
-  public_subnet_cidrs  = distinct(var.qa_public_subnet_cidrs)
-  private_subnet_cidrs = distinct([])
-  vpc_id               = module.aws_vpc1.vpc_id
-  #title: converts the first letter of each word in the given string to uppercase.
-  department = title("optum_qa")
 }
 module "aws_route_tables1" {
   source               = "./modules/aws_route_tables"
@@ -79,75 +52,7 @@ module "aws_security_groups1" {
   source     = "./modules/aws_security_groups"
   vpc_id     = module.aws_vpc1.vpc_id
   department = title("optum")
-}
-module "aws_ec2_dev" {
-  source               = "./modules/aws_ec2"
-  public_subnet_cidrs  = var.dev_public_subnet_cidrs
-  private_subnet_cidrs = distinct([])
-  public_subnet_ids    = module.aws_subnets_dev.public_subnet_ids
-  pub_sg_id            = module.aws_security_groups1.pub_sg_id
-  instance_type        = "t2.micro"
-  ami                  = lookup(local.ami_map, var.ami)
-  key_name             = aws_key_pair.glpskey.key_name
-  private_subnet_ids   = module.aws_subnets_dev.private_subnet_ids
-  private_sg_id        = module.aws_security_groups1.private_sg_id
-  user_data            = lookup(local.user_data, var.ami)
-  department           = title("dev")
-}
-module "aws_ec2_test" {
-  source               = "./modules/aws_ec2"
-  public_subnet_cidrs  = var.test_public_subnet_cidrs
-  private_subnet_cidrs = distinct([])
-  public_subnet_ids    = module.aws_subnets_test.public_subnet_ids
-  pub_sg_id            = module.aws_security_groups1.pub_sg_id
-  instance_type        = "t2.micro"
-  ami                  = lookup(local.ami_map, var.ami)
-  key_name             = aws_key_pair.glpskey.key_name
-  private_subnet_ids   = module.aws_subnets_test.private_subnet_ids
-  private_sg_id        = module.aws_security_groups1.private_sg_id
-  user_data            = lookup(local.user_data, var.ami)
-  department           = title("test")
-}
-module "aws_ec2_qa" {
-  source               = "./modules/aws_ec2"
-  public_subnet_cidrs  = var.qa_public_subnet_cidrs
-  private_subnet_cidrs = distinct([])
-  public_subnet_ids    = module.aws_subnets_qa.public_subnet_ids
-  pub_sg_id            = module.aws_security_groups1.pub_sg_id
-  instance_type        = "t2.micro"
-  ami                  = lookup(local.ami_map, var.ami)
-  key_name             = aws_key_pair.glpskey.key_name
-  private_subnet_ids   = module.aws_subnets_qa.private_subnet_ids
-  private_sg_id        = module.aws_security_groups1.private_sg_id
-  user_data            = lookup(local.user_data, var.ami)
-  department           = title("qa")
-}
-module "local_file" {
-  source = "./modules/local_file"
-  public_server_ip = concat(module.aws_ec2_ansible-controller.public_server_ip,
-    module.aws_ec2_dev.public_server_ip, module.aws_ec2_test.public_server_ip,
-  module.aws_ec2_qa.public_server_ip)
-  private_server_ip = concat(module.aws_ec2_ansible-controller.private_server_ip,
-    module.aws_ec2_dev.private_server_ip, module.aws_ec2_test.private_server_ip,
-  module.aws_ec2_qa.private_server_ip)
 }*/
-
-
-module "aws_s3_bucket" {
-  source      = "./modules/aws_s3_bucket"
-  bucket_name = var.bucket_name
-}
-module "aws_vpc" {
-  source         = "./modules/aws_vpc"
-  vpc_cidr_block = var.vpc_cidr_block
-  department     = title(var.department)
-}
-module "aws_igw" {
-  source     = "./modules/aws_igw"
-  vpc_id     = module.aws_vpc.vpc_id
-  department = title(var.department)
-}
-
 module "aws_subnets" {
   source = "./modules/aws_subnets"
   #distinct: takes a list and returns a new list with any duplicate elements removed.
@@ -164,7 +69,7 @@ module "aws_route_tables" {
   igw_id               = module.aws_igw.igw_id
   public_subnet_cidrs  = distinct(var.public_subnet_cidrs)
   private_subnet_cidrs = distinct(var.private_subnet_cidrs)
-  public_subnet_ids    = module.aws_subnets.public_subnet_ids
+  public_subnet_ids    = concat(module.aws_subnets.public_subnet_ids, module.aws_subnets_dev.public_subnet_ids, module.aws_subnets_test.public_subnet_ids, module.aws_subnets_qa.public_subnet_ids)
   private_subnet_ids   = module.aws_subnets.private_subnet_ids
   department           = title(var.department)
 }
@@ -189,6 +94,118 @@ module "aws_ec2_ansible-controller" {
   user_data            = lookup(local.user_data, var.ami)
   department           = title("ansible-controller")
 }
+module "aws_subnets_dev" {
+  source = "./modules/aws_subnets"
+  #distinct: takes a list and returns a new list with any duplicate elements removed.
+  public_subnet_cidrs  = distinct(var.dev_public_subnet_cidrs)
+  private_subnet_cidrs = distinct([])
+  vpc_id               = module.aws_vpc.vpc_id
+  #title: converts the first letter of each word in the given string to uppercase.
+  department = title("optum_dev")
+}
+module "aws_subnets_test" {
+  source = "./modules/aws_subnets"
+  #distinct: takes a list and returns a new list with any duplicate elements removed.
+  public_subnet_cidrs  = distinct(var.test_public_subnet_cidrs)
+  private_subnet_cidrs = distinct([])
+  vpc_id               = module.aws_vpc.vpc_id
+  #title: converts the first letter of each word in the given string to uppercase.
+  department = title("optum_test")
+}
+module "aws_subnets_qa" {
+  source = "./modules/aws_subnets"
+  #distinct: takes a list and returns a new list with any duplicate elements removed.
+  public_subnet_cidrs  = distinct(var.qa_public_subnet_cidrs)
+  private_subnet_cidrs = distinct([])
+  vpc_id               = module.aws_vpc.vpc_id
+  #title: converts the first letter of each word in the given string to uppercase.
+  department = title("optum_qa")
+}
+
+module "aws_ec2_dev" {
+  source               = "./modules/aws_ec2"
+  public_subnet_cidrs  = var.dev_public_subnet_cidrs
+  private_subnet_cidrs = distinct([])
+  public_subnet_ids    = module.aws_subnets_dev.public_subnet_ids
+  pub_sg_id            = module.aws_security_groups.pub_sg_id
+  instance_type        = "t2.micro"
+  ami                  = lookup(local.ami_map, var.ami)
+  key_name             = aws_key_pair.glpskey.key_name
+  private_subnet_ids   = module.aws_subnets_dev.private_subnet_ids
+  private_sg_id        = module.aws_security_groups.private_sg_id
+  user_data            = lookup(local.user_data, var.ami)
+  department           = title("dev")
+}
+module "aws_ec2_test" {
+  source               = "./modules/aws_ec2"
+  public_subnet_cidrs  = var.test_public_subnet_cidrs
+  private_subnet_cidrs = distinct([])
+  public_subnet_ids    = module.aws_subnets_test.public_subnet_ids
+  pub_sg_id            = module.aws_security_groups.pub_sg_id
+  instance_type        = "t2.micro"
+  ami                  = lookup(local.ami_map, var.ami)
+  key_name             = aws_key_pair.glpskey.key_name
+  private_subnet_ids   = module.aws_subnets_test.private_subnet_ids
+  private_sg_id        = module.aws_security_groups.private_sg_id
+  user_data            = lookup(local.user_data, var.ami)
+  department           = title("test")
+}
+module "aws_ec2_qa" {
+  source               = "./modules/aws_ec2"
+  public_subnet_cidrs  = var.qa_public_subnet_cidrs
+  private_subnet_cidrs = distinct([])
+  public_subnet_ids    = module.aws_subnets_qa.public_subnet_ids
+  pub_sg_id            = module.aws_security_groups.pub_sg_id
+  instance_type        = "t2.micro"
+  ami                  = lookup(local.ami_map, var.ami)
+  key_name             = aws_key_pair.glpskey.key_name
+  private_subnet_ids   = module.aws_subnets_qa.private_subnet_ids
+  private_sg_id        = module.aws_security_groups.private_sg_id
+  user_data            = lookup(local.user_data, var.ami)
+  department           = title("qa")
+}
+module "local_file" {
+  source                            = "./modules/local_file"
+  ansible_controller_public_servers = module.aws_ec2_ansible-controller.public_server_ip
+  dev_public_servers                = module.aws_ec2_dev.public_server_ip
+  test_public_servers               = module.aws_ec2_test.public_server_ip
+  qa_public_servers                 = module.aws_ec2_qa.public_server_ip
+  public_server_ip = concat(module.aws_ec2_ansible-controller.public_server_ip,
+    module.aws_ec2_dev.public_server_ip, module.aws_ec2_test.public_server_ip,
+  module.aws_ec2_qa.public_server_ip)
+  private_server_ip = concat(module.aws_ec2_ansible-controller.private_server_ip,
+    module.aws_ec2_dev.private_server_ip, module.aws_ec2_test.private_server_ip,
+  module.aws_ec2_qa.private_server_ip)
+}
+
+module "aws_s3_bucket" {
+  source      = "./modules/aws_s3_bucket"
+  bucket_name = var.bucket_name
+}
+module "aws_vpc" {
+  source         = "./modules/aws_vpc"
+  vpc_cidr_block = var.vpc_cidr_block
+  department     = title(var.department)
+}
+module "aws_igw" {
+  source     = "./modules/aws_igw"
+  vpc_id     = module.aws_vpc.vpc_id
+  department = title(var.department)
+}
+
+/* module "aws_launchtemplate" {
+  source                = "./modules/aws_launchtemplate"
+  instance_type         = var.instance_type
+  ami                   = lookup(local.ami_map, var.ami)
+  instance_profile_role = var.instance_profile_role
+  key_name              = aws_key_pair.glpskey.key_name
+  pub_sg_id             = module.aws_security_groups.pub_sg_id
+  user_data             = base64encode(lookup(local.user_data, var.ami))
+  department            = title(var.department)
+} */
+
+
+/* 
 module "local_file" {
   source            = "./modules/local_file"
   public_server_ip  = concat(module.aws_ec2_ansible-controller.public_server_ip)
@@ -205,4 +222,4 @@ module "aws_loadbalancer" {
   aws_instance_ids   = module.aws_ec2_ansible-controller.aws_instance_ids
   department         = title(var.department)
   depends_on         = [module.aws_ec2_ansible-controller]
-}
+} */

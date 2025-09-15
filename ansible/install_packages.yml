@@ -1,0 +1,13 @@
+---
+- name: Install environment-specific packages
+  hosts: 
+    - dev_public_servers
+    - test_public_servers
+    - qa_public_servers
+  become: yes
+
+  tasks:
+    - name: Install packages for this environment
+      apt:
+        name: "{{ packages_to_install }}"
+        state: present

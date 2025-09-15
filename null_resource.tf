@@ -1,52 +1,89 @@
 resource "null_resource" "configure_server" {
   count = length(var.public_subnet_cidrs)
+
   triggers = {
     instance_id = join(",", module.aws_ec2_ansible-controller.aws_instance_ids)
   }
+
+  # Upload requirements.sh
   provisioner "file" {
     source      = "requirements.sh"
     destination = "/tmp/requirements.sh"
+
     connection {
       type        = "ssh"
       user        = var.ami == "ubuntu" ? "ubuntu" : "ec2-user"
-      private_key = file("~/.ssh/id_ed25519_glpskumar")
+      private_key = file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
       host        = element(module.aws_ec2_ansible-controller.public_server_ip, count.index)
     }
   }
+
+  # Upload PRIVATE key to controller server
   provisioner "file" {
-    source      = "ansible_inventory_file.ini"
-    destination = "/home/ubuntu/ansible_inventory_file.ini"
+    source      = pathexpand("~/.ssh/id_ed25519_glpskumar")
+    destination = "${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/id_ed25519_glpskumar"
+
     connection {
       type        = "ssh"
       user        = var.ami == "ubuntu" ? "ubuntu" : "ec2-user"
-      private_key = file("~/.ssh/id_ed25519_glpskumar")
+      private_key = file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
       host        = element(module.aws_ec2_ansible-controller.public_server_ip, count.index)
     }
   }
+
+  # Upload inventory file to controller
+  provisioner "file" {
+    source      = pathexpand("ansible")
+    destination = "${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible"
+
+    connection {
+      type        = "ssh"
+      user        = var.ami == "ubuntu" ? "ubuntu" : "ec2-user"
+      private_key = file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
+      host        = element(module.aws_ec2_ansible-controller.public_server_ip, count.index)
+    }
+  }
+
   provisioner "remote-exec" {
     inline = [
-      "sleep ${count.index * 20}", # wait 20s * index
+      "sleep ${count.index * 20}",
+
+      # Install dependencies
       "sudo sed -i 's/\r$//' /tmp/requirements.sh",
-      "sudo sed -i 's/\r$//' /home/ubuntu/ansible_inventory_file.ini",
       "sudo chmod +x /tmp/requirements.sh",
-      "sudo chmod +x /home/ubuntu/ansible_inventory_file.ini",
       "sudo /tmp/requirements.sh",
-      "ANSIBLE_HOST_KEY_CHECKING=False ansible -i ansible_inventory_file.ini all -m ping"
+
+      # Fix SSH setup
+      "mkdir -p ~/.ssh",
+      "chmod 700 ~/.ssh",
+      "chmod 600 ~/id_ed25519_glpskumar",
+      "echo 'IdentityFile ~/id_ed25519_glpskumar' >> ~/.ssh/config",
+
+      # Ensure Ansible uses the correct key
+      "export ANSIBLE_PRIVATE_KEY_FILE=~/id_ed25519_glpskumar",
+
+      # Ping all servers from inventory
+      "ANSIBLE_HOST_KEY_CHECKING=False ansible -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible_inventory_file.ini public_servers -m ping",
+      "cd /home/ubuntu/ansible",
+      "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible_inventory_file.ini install_packages.yml"
     ]
+
     connection {
       type        = "ssh"
       user        = var.ami == "ubuntu" ? "ubuntu" : "ec2-user"
-      private_key = file("~/.ssh/id_ed25519_glpskumar")
+      private_key = file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
       host        = element(module.aws_ec2_ansible-controller.public_server_ip, count.index)
       timeout     = "2m"
     }
   }
+
   provisioner "local-exec" {
-    command = <<EOH
-      echo ${element(module.aws_ec2_ansible-controller.public_server_ip, count.index)} >> uhg_servers_list.txt
-    EOH
+    command = "echo ${element(module.aws_ec2_ansible-controller.public_server_ip, count.index)} >> uhg_servers_list.txt"
   }
+
 }
+
+
 /* 
 resource "null_resource" "dev_configure_server" {
   count = length(module.aws_ec2_dev.public_server_ip)
@@ -59,7 +96,7 @@ resource "null_resource" "dev_configure_server" {
     connection {
       type        = "ssh"
       user        = var.ami == "ubuntu" ? "ubuntu" : "ec2-user"
-      private_key = file("~/.ssh/id_ed25519_glpskumar")
+      private_key = file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
       host        = element(module.aws_ec2_dev.public_server_ip, count.index)
     }
   }
@@ -73,7 +110,7 @@ resource "null_resource" "dev_configure_server" {
     connection {
       type        = "ssh"
       user        = var.ami == "ubuntu" ? "ubuntu" : "ec2-user"
-      private_key = file("~/.ssh/id_ed25519_glpskumar")
+      private_key = file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
       host        = element(module.aws_ec2_dev.public_server_ip, count.index)
       timeout     = "2m"
     }
@@ -97,7 +134,7 @@ resource "null_resource" "test_configure_server" {
     connection {
       type        = "ssh"
       user        = var.ami == "ubuntu" ? "ubuntu" : "ec2-user"
-      private_key = file("~/.ssh/id_ed25519_glpskumar")
+      private_key = file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
       host        = element(module.aws_ec2_test.public_server_ip, count.index)
     }
   }
@@ -111,7 +148,7 @@ resource "null_resource" "test_configure_server" {
     connection {
       type        = "ssh"
       user        = var.ami == "ubuntu" ? "ubuntu" : "ec2-user"
-      private_key = file("~/.ssh/id_ed25519_glpskumar")
+      private_key = file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
       host        = element(module.aws_ec2_test.public_server_ip, count.index)
       timeout     = "2m"
     }
@@ -134,7 +171,7 @@ resource "null_resource" "qa_configure_server" {
     connection {
       type        = "ssh"
       user        = var.ami == "ubuntu" ? "ubuntu" : "ec2-user"
-      private_key = file("~/.ssh/id_ed25519_glpskumar")
+      private_key = file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
       host        = element(module.aws_ec2_qa.public_server_ip, count.index)
     }
   }
@@ -148,7 +185,7 @@ resource "null_resource" "qa_configure_server" {
     connection {
       type        = "ssh"
       user        = var.ami == "ubuntu" ? "ubuntu" : "ec2-user"
-      private_key = file("~/.ssh/id_ed25519_glpskumar")
+      private_key = file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
       host        = element(module.aws_ec2_qa.public_server_ip, count.index)
       timeout     = "2m"
     }

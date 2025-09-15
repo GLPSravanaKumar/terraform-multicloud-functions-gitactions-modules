@@ -57,7 +57,7 @@ variable "department" {
 variable "ami" {
   description = "Type of instance Ami "
 }
-/* variable "dev_public_subnet_cidrs" {
+variable "dev_public_subnet_cidrs" {
   description = "dev public subnet cidr values"
 }
 
@@ -68,7 +68,11 @@ variable "test_public_subnet_cidrs" {
 variable "qa_public_subnet_cidrs" {
   description = "qa public subnet cidr values"
 }
- */
+/*
 variable "lb_type" {
   description = "lb type: ALB, NLB,GLB"
 }
+variable "instance_profile_role" {
+  description = "IAM instance profile role name"
+}
+ */
