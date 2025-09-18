@@ -22,10 +22,10 @@ resource "local_file" "ansible_inventory_file" {
       dev_public_servers                = var.dev_public_servers
       test_public_servers               = var.test_public_servers
       qa_public_servers                 = var.qa_public_servers
-      
-      public_servers                    = var.public_server_ip
-      private_servers                   = var.private_server_ip
+
+      public_servers  = var.public_server_ip
+      private_servers = var.private_server_ip
     }
   )
-  filename = "${path.root}/ansible/ansible_inventory_file.ini"
+  filename = "${path.root}/ansible/inventory_file.ini"
 }

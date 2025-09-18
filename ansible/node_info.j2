@@ -1,0 +1,12 @@
+# Report for {{ inventory_hostname }}
+
+IP Address: {{ ansible_default_ipv4.address }}
+Hostname: {{ ansible_hostname }}
+OS: {{ ansible_distribution }} {{ ansible_distribution_version }}
+Kernel: {{ ansible_kernel }}
+CPU Cores: {{ ansible_processor_cores }}
+RAM: {{ ansible_memory_mb.real.total }} MB
+Disks:
+{% for m in ansible_mounts %}
+- {{ m.mount }}: {{ m.size_total | int // 1024 // 1024 }} MB
+{% endfor %}

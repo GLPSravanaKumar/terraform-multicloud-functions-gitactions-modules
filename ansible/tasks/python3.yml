@@ -1,0 +1,10 @@
+    - name: Install Python3
+      apt:
+        name: python3
+        state: present
+      when: ansible_os_family == "Debian"
+    - name: Install Python3
+      yum:
+        name: python3
+        state: present
+      when: ansible_os_family == "RedHat"

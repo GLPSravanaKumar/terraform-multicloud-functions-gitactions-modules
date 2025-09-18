@@ -28,12 +28,12 @@ output "mangodb_proj_cluster_count" {
 # Example showing how concat works with subnet IDs from different environments:
 output "public_subnet_ids" {
   description = "List of public subnet IDs combined from all environments"
-  value = flatten([
+  value = concat(
     module.aws_subnets.public_subnet_ids,      # Production subnets
     module.aws_subnets_dev.public_subnet_ids,  # Dev subnets  
     module.aws_subnets_test.public_subnet_ids, # Test subnets
     module.aws_subnets_qa.public_subnet_ids    # QA subnets
-  ])
+  )
 }
 # concat combines multiple lists into a single list
 # Another example showing concat with instance IDs from different environments::

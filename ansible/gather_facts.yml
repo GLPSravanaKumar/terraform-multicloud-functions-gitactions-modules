@@ -1,0 +1,13 @@
+- name: Gather and save facts from all servers
+  hosts: public_servers
+  gather_facts: yes
+  become: false
+  tasks:
+    - name: Save node info using template
+      template:
+        src: node_info.j2
+        dest: /tmp/{{ inventory_hostname }}_report.txt
+    - name: Fetch report to local controller
+      fetch:
+        src: /tmp/{{ inventory_hostname }}_report.txt
+        dest: "{{ playbook_dir }}/reports/"

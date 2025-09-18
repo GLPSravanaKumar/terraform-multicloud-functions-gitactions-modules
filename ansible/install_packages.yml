@@ -1,13 +1,47 @@
 ---
 - name: Install environment-specific packages
-  hosts: 
+  hosts:
     - dev_public_servers
     - test_public_servers
     - qa_public_servers
   become: yes
+  gather_facts: yes
 
   tasks:
-    - name: Install packages for this environment
+    - name: Update apt cache
       apt:
-        name: "{{ packages_to_install }}"
-        state: present
+        update_cache: yes
+        cache_valid_time: 0
+      retries: 3
+      delay: 10
+      register: apt_update_result
+      until: apt_update_result is succeeded
+      when: ansible_os_family == "Debian"
+    - name: Update yum/dnf cache
+      yum: 
+        update_cache: yes
+      when: ansible_os_family == "RedHat"
+
+    - name: Upgrade base packages
+      apt:
+        upgrade: dist
+        update_cache: yes
+        force: yes
+      when: ansible_os_family == "Debian"
+    
+    - name: Include commonpackages installation tasks
+      include_tasks: tasks/common-packages.yml
+    - name: Include Docker installation tasks
+      include_tasks: tasks/docker.yml
+    - name: Include Terraform installation tasks
+      include_tasks: tasks/terraform.yml
+    - name: Include WebServer installation tasks
+      include_tasks: tasks/webserver.yml
+    - name: Include Python installation tasks
+      include_tasks: tasks/python3.yml
+  handlers:
+    - import_tasks: handlers/webserver.yml
+        
+
+    
+

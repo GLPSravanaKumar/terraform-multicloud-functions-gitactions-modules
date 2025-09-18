@@ -1,0 +1,12 @@
+    - name: Instaling webserver on Debian
+      apt:
+        name: apache2
+        state: present
+      when: ansible_os_family == "Debian"
+      notify: starting apache2 server
+    - name: Instaling webserver on Redhat
+      yum:
+        name: httpd
+        state: present
+      when: ansible_os_family == "RedHat"
+      notify: starting httpd server

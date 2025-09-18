@@ -10,9 +10,9 @@ vpc_cidr_block           = "10.0.0.0/16"
 instance_type            = "t2.medium"
 ami                      = "ubuntu"
 department               = "uhg"
-dev_public_subnet_cidrs  = ["10.0.25.0/24","10.0.27.0/24","10.0.29.0/24"]
-test_public_subnet_cidrs = ["10.0.35.0/24","10.0.37.0/24","10.0.39.0/24"]
-qa_public_subnet_cidrs   = ["10.0.45.0/24","10.0.47.0/24","10.0.49.0/24"]
+dev_public_subnet_cidrs  = ["10.0.25.0/24"]
+test_public_subnet_cidrs = ["10.0.35.0/24"]
+qa_public_subnet_cidrs   = ["10.0.45.0/24"]
 
 /* lb_type               = "application"
 instance_profile_role = "ec2-readonly"

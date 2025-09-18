@@ -3,6 +3,7 @@ resource "null_resource" "configure_server" {
 
   triggers = {
     instance_id = join(",", module.aws_ec2_ansible-controller.aws_instance_ids)
+    always_run  = timestamp()
   }
 
   # Upload requirements.sh
@@ -63,9 +64,11 @@ resource "null_resource" "configure_server" {
       "export ANSIBLE_PRIVATE_KEY_FILE=~/id_ed25519_glpskumar",
 
       # Ping all servers from inventory
-      "ANSIBLE_HOST_KEY_CHECKING=False ansible -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible_inventory_file.ini public_servers -m ping",
-      "cd /home/ubuntu/ansible",
-      "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible_inventory_file.ini install_packages.yml"
+      "ANSIBLE_HOST_KEY_CHECKING=False ansible -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/inventory_file.ini public_servers -m ping",
+      "cd ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible",
+      "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/inventory_file.ini install_packages.yml",
+      "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/inventory_file.ini gather_facts.yml"
+
     ]
 
     connection {
