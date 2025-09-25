@@ -39,6 +39,8 @@
       include_tasks: tasks/webserver.yml
     - name: Include Python installation tasks
       include_tasks: tasks/python3.yml
+    - name: Included Debug for Gather facts
+      include_tasks: tasks/debug.yml
   handlers:
     - import_tasks: handlers/webserver.yml
         
