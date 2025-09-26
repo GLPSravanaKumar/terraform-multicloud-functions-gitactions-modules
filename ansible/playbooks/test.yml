@@ -1,0 +1,8 @@
+- name: Install TEST environment-specific packages and TERRAFORM,DOCKER,PYTHON3
+  hosts:
+    - test_public_servers
+  become: true
+  gather_facts: yes  
+
+  roles:
+    - test

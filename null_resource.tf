@@ -65,8 +65,17 @@ resource "null_resource" "configure_server" {
 
       # Ping all servers from inventory
       "ANSIBLE_HOST_KEY_CHECKING=False ansible -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/inventory_file.ini public_servers -m ping",
+
       "cd ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible",
+
       "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/inventory_file.ini install_packages.yml",
+
+      "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/inventories/dev/dev_hosts.ini ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/playbooks/dev.yml",
+
+      "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/inventories/test/test_hosts.ini ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/playbooks/test.yml",
+
+      "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/inventories/qa/qa_hosts.ini ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/playbooks/qa.yml",
+
       "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/inventory_file.ini gather_facts.yml"
 
     ]

@@ -1,0 +1,4 @@
+    - name: Install packges git,wget,tree,curl
+      include_tasks: packages.yml
+    - name: Install webserver in DEV
+      include_tasks: webserver.yml

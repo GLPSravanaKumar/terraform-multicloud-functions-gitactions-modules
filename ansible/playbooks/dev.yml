@@ -1,0 +1,8 @@
+- name: Install Dev environment-specific packages and webserver
+  hosts:
+    - dev_public_servers
+  become: true
+  gather_facts: yes  
+  
+  roles:
+    - dev

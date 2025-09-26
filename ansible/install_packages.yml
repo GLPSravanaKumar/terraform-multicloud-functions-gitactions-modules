@@ -4,7 +4,7 @@
     - dev_public_servers
     - test_public_servers
     - qa_public_servers
-  become: yes
+  become: true
   gather_facts: yes
 
   tasks:
@@ -17,8 +17,9 @@
       register: apt_update_result
       until: apt_update_result is succeeded
       when: ansible_os_family == "Debian"
+
     - name: Update yum/dnf cache
-      yum: 
+      yum:
         update_cache: yes
       when: ansible_os_family == "RedHat"
 
@@ -28,22 +29,18 @@
         update_cache: yes
         force: yes
       when: ansible_os_family == "Debian"
-    
-    - name: Include commonpackages installation tasks
-      include_tasks: tasks/common-packages.yml
-    - name: Include Docker installation tasks
-      include_tasks: tasks/docker.yml
-    - name: Include Terraform installation tasks
-      include_tasks: tasks/terraform.yml
-    - name: Include WebServer installation tasks
-      include_tasks: tasks/webserver.yml
-    - name: Include Python installation tasks
-      include_tasks: tasks/python3.yml
-    - name: Included Debug for Gather facts
-      include_tasks: tasks/debug.yml
-  handlers:
-    - import_tasks: handlers/webserver.yml
-        
 
-    
+    - name: Fetching and print servers data
+      debug:
+        msg: |
+          IP Address: {{ ansible_default_ipv4.address }}
+          Hostname: {{ ansible_hostname }}
+          OS: {{ ansible_distribution }} {{ ansible_distribution_version }}
+          Kernel: {{ ansible_kernel }}
+          CPU Cores: {{ ansible_processor_cores }}
+          RAM: {{ ansible_memory_mb.real.total }} MB
+          Disks:
+          {% for m in ansible_mounts %}
+          - {{ m.mount }}: {{ m.size_total | int // 1024 // 1024 }} MB
+          {% endfor %}
 

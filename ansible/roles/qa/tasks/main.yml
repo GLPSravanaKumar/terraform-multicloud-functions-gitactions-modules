@@ -1,0 +1,2 @@
+    - name: Install packges git,wget,tree,curl
+      include_tasks: packages.yml

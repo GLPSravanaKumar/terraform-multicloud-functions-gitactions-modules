@@ -1,0 +1,23 @@
+- name: Install common packages on Debian
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - git
+    - wget
+    - curl
+    - tree
+    - gnupg
+    - software-properties-common
+  when: ansible_os_family == "Debian"
+- name: Install common packages on RedHat
+  yum:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - git
+    - wget
+    - curl
+    - tree
+    - gnupg
+  when: ansible_os_family == "RedHat"

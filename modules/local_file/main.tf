@@ -30,7 +30,7 @@ resource "local_file" "ansible_inventory_file" {
   filename = "${path.root}/ansible/inventory_file.ini"
 }
 resource "local_file" "ansible_dev_inventory_file" {
-  content = templatefile("${path.root}/ansible/templates/dev.tpl",
+  content = templatefile("${path.root}/ansible/roles/dev/templates/dev.tpl",
     {
       dev_public_servers = var.dev_public_servers
     }
@@ -38,7 +38,7 @@ resource "local_file" "ansible_dev_inventory_file" {
   filename = "${path.root}/ansible/inventories/dev/dev_hosts.ini"
 }
 resource "local_file" "ansible_test_inventory_file" {
-  content = templatefile("${path.root}/ansible/templates/test.tpl",
+  content = templatefile("${path.root}/ansible/roles/test/templates/test.tpl",
     {
       test_public_servers = var.test_public_servers
     }
@@ -46,7 +46,7 @@ resource "local_file" "ansible_test_inventory_file" {
   filename = "${path.root}/ansible/inventories/test/test_hosts.ini"
 }
 resource "local_file" "ansible_qa_inventory_file" {
-  content = templatefile("${path.root}/ansible/templates/qa.tpl",
+  content = templatefile("${path.root}/ansible/roles/qa/templates/qa.tpl",
     {
       qa_public_servers = var.qa_public_servers
     }
