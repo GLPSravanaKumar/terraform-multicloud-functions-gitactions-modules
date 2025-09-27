@@ -70,21 +70,6 @@ jobs:
         run: |
           curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
-  ansible: # 👈 Ansible Installation SSH setup
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-      - name: Set up SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519_glpskumar
-          chmod 600 ~/.ssh/id_ed25519_glpskumar
-      - name: Install Ansible
-        run: |
-          sudo apt update
-          sudo apt install -y ansible
-
   terraform:
     runs-on: ubuntu-latest # 👈 This ensures it runs on your self-hosted runner
     steps:
@@ -126,6 +111,16 @@ jobs:
       - name: Set Azure Subscription
         run: |
           az account set --subscription $AZURE_SUBSCRIPTION_ID
+      #👈 ---Ansible SSH access and Installation---- 👈#
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519_glpskumar
+          chmod 600 ~/.ssh/id_ed25519_glpskumar
+      - name: Install Ansible
+        run: |
+          sudo apt update
+          sudo apt install -y ansible
       # Check if the init step was successful
       - name: Terraform Init
         id: init
