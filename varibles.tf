@@ -76,3 +76,10 @@ variable "instance_profile_role" {
   description = "IAM instance profile role name"
 }
  */
+
+#set conditions in Terraform to decide whether to use a local file path or a GitHub Actions secret-provided private key
+variable "private_key" {
+  description = "SSH private key content (if empty, fallback to local file)"
+  type        = string
+  default     = ""
+}

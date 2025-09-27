@@ -14,7 +14,7 @@ resource "null_resource" "configure_server" {
     connection {
       type        = "ssh"
       user        = var.ami == "ubuntu" ? "ubuntu" : "ec2-user"
-      private_key = file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
+      private_key = length(var.private_key) > 0 ? var.private_key : file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
       host        = element(module.aws_ec2_ansible-controller.public_server_ip, count.index)
     }
   }
@@ -27,7 +27,7 @@ resource "null_resource" "configure_server" {
     connection {
       type        = "ssh"
       user        = var.ami == "ubuntu" ? "ubuntu" : "ec2-user"
-      private_key = file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
+      private_key = length(var.private_key) > 0 ? var.private_key : file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
       host        = element(module.aws_ec2_ansible-controller.public_server_ip, count.index)
     }
   }
@@ -40,7 +40,7 @@ resource "null_resource" "configure_server" {
     connection {
       type        = "ssh"
       user        = var.ami == "ubuntu" ? "ubuntu" : "ec2-user"
-      private_key = file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
+      private_key = length(var.private_key) > 0 ? var.private_key : file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
       host        = element(module.aws_ec2_ansible-controller.public_server_ip, count.index)
     }
   }
@@ -83,7 +83,7 @@ resource "null_resource" "configure_server" {
     connection {
       type        = "ssh"
       user        = var.ami == "ubuntu" ? "ubuntu" : "ec2-user"
-      private_key = file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
+      private_key = length(var.private_key) > 0 ? var.private_key : file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
       host        = element(module.aws_ec2_ansible-controller.public_server_ip, count.index)
       timeout     = "2m"
     }
@@ -108,7 +108,7 @@ resource "null_resource" "dev_configure_server" {
     connection {
       type        = "ssh"
       user        = var.ami == "ubuntu" ? "ubuntu" : "ec2-user"
-      private_key = file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
+      private_key = length(var.private_key) > 0 ? var.private_key : file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
       host        = element(module.aws_ec2_dev.public_server_ip, count.index)
     }
   }
@@ -122,7 +122,7 @@ resource "null_resource" "dev_configure_server" {
     connection {
       type        = "ssh"
       user        = var.ami == "ubuntu" ? "ubuntu" : "ec2-user"
-      private_key = file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
+      private_key = length(var.private_key) > 0 ? var.private_key : file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
       host        = element(module.aws_ec2_dev.public_server_ip, count.index)
       timeout     = "2m"
     }
@@ -146,7 +146,7 @@ resource "null_resource" "test_configure_server" {
     connection {
       type        = "ssh"
       user        = var.ami == "ubuntu" ? "ubuntu" : "ec2-user"
-      private_key = file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
+      private_key = length(var.private_key) > 0 ? var.private_key : file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
       host        = element(module.aws_ec2_test.public_server_ip, count.index)
     }
   }
@@ -160,7 +160,7 @@ resource "null_resource" "test_configure_server" {
     connection {
       type        = "ssh"
       user        = var.ami == "ubuntu" ? "ubuntu" : "ec2-user"
-      private_key = file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
+      private_key = length(var.private_key) > 0 ? var.private_key : file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
       host        = element(module.aws_ec2_test.public_server_ip, count.index)
       timeout     = "2m"
     }
@@ -183,7 +183,7 @@ resource "null_resource" "qa_configure_server" {
     connection {
       type        = "ssh"
       user        = var.ami == "ubuntu" ? "ubuntu" : "ec2-user"
-      private_key = file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
+      private_key = length(var.private_key) > 0 ? var.private_key : file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
       host        = element(module.aws_ec2_qa.public_server_ip, count.index)
     }
   }
@@ -197,7 +197,7 @@ resource "null_resource" "qa_configure_server" {
     connection {
       type        = "ssh"
       user        = var.ami == "ubuntu" ? "ubuntu" : "ec2-user"
-      private_key = file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
+      private_key = length(var.private_key) > 0 ? var.private_key : file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
       host        = element(module.aws_ec2_qa.public_server_ip, count.index)
       timeout     = "2m"
     }
