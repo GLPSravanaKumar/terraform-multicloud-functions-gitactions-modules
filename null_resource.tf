@@ -20,7 +20,7 @@ resource "null_resource" "configure_server" {
   }
 
   # Upload PRIVATE key to controller server
-  provisioner "file" {
+  /* provisioner "file" {
     source      = pathexpand("~/.ssh/id_ed25519_glpskumar")
     destination = "${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/id_ed25519_glpskumar"
 
@@ -30,7 +30,7 @@ resource "null_resource" "configure_server" {
       private_key = length(var.private_key) > 0 ? var.private_key : file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
       host        = element(module.aws_ec2_ansible-controller.public_server_ip, count.index)
     }
-  }
+  } */
 
   # Upload inventory file to controller
   provisioner "file" {
@@ -57,8 +57,10 @@ resource "null_resource" "configure_server" {
       # Fix SSH setup
       "mkdir -p ~/.ssh",
       "chmod 700 ~/.ssh",
+      # Write the key (from var.private_key if set, else local file content)
+      "echo '${var.private_key != "" ? var.private_key : file(pathexpand("~/.ssh/id_ed25519_glpskumar"))}' > ~/id_ed25519_glpskumar",
+      #      "echo 'IdentityFile ~/id_ed25519_glpskumar' >> ~/.ssh/config",
       "chmod 600 ~/id_ed25519_glpskumar",
-      "echo 'IdentityFile ~/id_ed25519_glpskumar' >> ~/.ssh/config",
 
       # Ensure Ansible uses the correct key
       "export ANSIBLE_PRIVATE_KEY_FILE=~/id_ed25519_glpskumar",

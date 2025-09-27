@@ -36,7 +36,7 @@ env:
   PACKER_PRODUCT_VERSION: 1.8.5
   TERRAFORM_PRODUCT_VERSION: 1.7.3
   ENVIRONMENT: ${{ github.event.inputs.environment }}
-  SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}}
+  TF_VAR_private_key: ${{secrets.SSH_PRIVATE_KEY}}
 
 jobs:
   tools_check:
