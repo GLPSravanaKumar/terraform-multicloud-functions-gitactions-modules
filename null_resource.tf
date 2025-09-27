@@ -58,12 +58,12 @@ resource "null_resource" "configure_server" {
       "mkdir -p ~/.ssh",
       "chmod 700 ~/.ssh",
       # Write the key (from var.private_key if set, else local file content)
-      "echo '${var.private_key != "" ? var.private_key : file(pathexpand("~/.ssh/id_ed25519_glpskumar"))}' > ~/id_ed25519_glpskumar",
-      "chmod 600 ~/id_ed25519_glpskumar",
+      "echo '${var.private_key != "" ? var.private_key : file(pathexpand("~/.ssh/id_ed25519_glpskumar"))}' > ~/.ssh/id_ed25519_glpskumar",
+      "chmod 600 ~/.ssh/id_ed25519_glpskumar",
       #      "echo 'IdentityFile ~/id_ed25519_glpskumar' >> ~/.ssh/config",
 
       # Ensure Ansible uses the correct key
-      "export ANSIBLE_PRIVATE_KEY_FILE=~/id_ed25519_glpskumar",
+      "export ANSIBLE_PRIVATE_KEY_FILE=~/.ssh/id_ed25519_glpskumar",
 
       # Ping all servers from inventory
       "ANSIBLE_HOST_KEY_CHECKING=False ansible -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/inventory_file.ini public_servers -m ping",

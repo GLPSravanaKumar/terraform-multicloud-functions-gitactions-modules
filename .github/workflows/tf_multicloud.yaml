@@ -70,7 +70,7 @@ jobs:
         run: |
           curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
-  ansible:
+  ansible: # 👈 Ansible Installation SSH setup
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -78,8 +78,8 @@ jobs:
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519_glpskumar
+          chmod 600 ~/.ssh/id_ed25519_glpskumar
       - name: Install Ansible
         run: |
           sudo apt update
