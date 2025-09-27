@@ -11,8 +11,8 @@ instance_type            = "t2.medium"
 ami                      = "ubuntu"
 department               = "uhg"
 dev_public_subnet_cidrs  = ["10.0.25.0/24"]
-test_public_subnet_cidrs = ["10.0.35.0/24"]
-qa_public_subnet_cidrs   = ["10.0.45.0/24"]
+test_public_subnet_cidrs = []
+qa_public_subnet_cidrs   = []
 
 /* lb_type               = "application"
 instance_profile_role = "ec2-readonly"

@@ -4,26 +4,26 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: 'Terraform action to perform plan, apply, or destroy'
+        description: "Terraform action to perform plan, apply, or destroy"
         required: true
-        default: 'plan'
+        default: "plan"
         type: choice
         options:
           - plan
           - apply
           - destroy
-#      cloud:
-#        description: 'Choose the cloud provider'
-#        required: true
-#        default: 'aws'
-#        type: choice
-#        options:
-#         - aws
-#          - azure
+      #      cloud:
+      #        description: 'Choose the cloud provider'
+      #        required: true
+      #        default: 'aws'
+      #        type: choice
+      #        options:
+      #         - aws
+      #          - azure
       environment:
-        description: 'Environment name (dev, stage, prod)'
+        description: "Environment name (dev, test, qa)"
         required: true
-        default: 'dev'
+        default: "dev"
 env:
   TERRAFORM_DESTROY: "NO"
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -40,37 +40,47 @@ env:
 jobs:
   tools_check:
     if: ${{ github.event.inputs.action == 'plan' }} # 👈 This ensures it runs only when the action is 'plan'
-    name: 'Checking Tools Status'
+    name: "Checking Tools Status"
     runs-on: ubuntu-latest
     defaults:
-     run:
-       shell: bash
+      run:
+        shell: bash
     steps:
-    - name: Print Runner Hostname
-      run: hostname
-      shell: bash
-    - name: Checkout Code
-      uses: actions/checkout@v4
-    - name: Install unzip
-      run: sudo apt-get update && sudo apt-get install -y unzip
-    - name: Setup Terraform with specified version on the runner
-      uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: ${{ env.TERRAFORM_PRODUCT_VERSION }}
-        cli_config_credentials_hostname: app.terraform.io
-        terraform_wrapper: true
-    - name: Setup `packer`
-      uses: hashicorp/setup-packer@main
-      id: setup
-      with:
-        version: ${{ env.PACKER_PRODUCT_VERSION }}
-    # Install Azure CLI
-    - name: Install Azure CLI
-      run: |
-        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+      - name: Print Runner Hostname
+        run: hostname
+        shell: bash
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Install unzip
+        run: sudo apt-get update && sudo apt-get install -y unzip
+      - name: Setup Terraform with specified version on the runner
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_PRODUCT_VERSION }}
+          cli_config_credentials_hostname: app.terraform.io
+          terraform_wrapper: true
+      - name: Setup `packer`
+        uses: hashicorp/setup-packer@main
+        id: setup
+        with:
+          version: ${{ env.PACKER_PRODUCT_VERSION }}
+      # Install Azure CLI
+      - name: Install Azure CLI
+        run: |
+          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+  ansible:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Install Ansible
+        run: |
+          sudo apt update
+          sudo apt install -y ansible
 
   terraform:
-    runs-on: ubuntu-latest   # 👈 This ensures it runs on your self-hosted runner
+    runs-on: ubuntu-latest # 👈 This ensures it runs on your self-hosted runner
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -78,9 +88,9 @@ jobs:
       - name: Setup Node.js (needed for Azure provider)
         uses: actions/setup-node@v4
         with:
-          node-version: '18' 
+          node-version: "18"
       - name: Install unzip
-        run: sudo apt-get update && sudo apt-get install -y unzip    
+        run: sudo apt-get update && sudo apt-get install -y unzip
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
@@ -102,7 +112,7 @@ jobs:
       - name: Azure Login
         uses: azure/login@v2
         with:
-          creds: '{"clientId":"${{ secrets.AZURE_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}","subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.AZURE_TENANT_ID }}"}'  
+          creds: '{"clientId":"${{ secrets.AZURE_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}","subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.AZURE_TENANT_ID }}"}'
 
       - name: Verify Azure CLI
         run: az account show
@@ -123,14 +133,14 @@ jobs:
         shell: bash
         if: ${{ (steps.init.exit_code == 0) && (github.event.inputs.action == 'plan' ) }}
         run: |
-          terraform plan 
+          terraform plan
 
       # ---------------- Terraform Apply ----------------
       - name: Terraform Apply
         if: ${{ github.event.inputs.action == 'apply' }}
-        run: terraform apply -auto-approve 
+        run: terraform apply -auto-approve
 
       # ---------------- Terraform Destroy ----------------
       - name: Terraform Destroy
         if: ${{ github.event.inputs.action == 'destroy' }}
-        run: terraform destroy -auto-approve 
+        run: terraform destroy -auto-approve
