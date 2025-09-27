@@ -57,10 +57,10 @@ resource "null_resource" "configure_server" {
       # Fix SSH setup
       "mkdir -p ~/.ssh",
       "chmod 700 ~/.ssh",
+      "chmod 600 ~/id_ed25519_glpskumar",
       # Write the key (from var.private_key if set, else local file content)
       "echo '${var.private_key != "" ? var.private_key : file(pathexpand("~/.ssh/id_ed25519_glpskumar"))}' > ~/id_ed25519_glpskumar",
       #      "echo 'IdentityFile ~/id_ed25519_glpskumar' >> ~/.ssh/config",
-      "chmod 600 ~/id_ed25519_glpskumar",
 
       # Ensure Ansible uses the correct key
       "export ANSIBLE_PRIVATE_KEY_FILE=~/id_ed25519_glpskumar",
