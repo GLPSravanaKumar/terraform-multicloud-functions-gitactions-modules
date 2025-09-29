@@ -33,3 +33,6 @@ variable "user_data" {
 variable "department" {
   description = "value of department tag"
 }
+variable "ansible_ecr_instance_profile" {
+  description = "instance profile for ansible servers get ecr readonly access"
+}

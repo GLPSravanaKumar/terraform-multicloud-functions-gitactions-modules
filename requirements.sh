@@ -14,12 +14,17 @@ fi
 
 echo "Detected OS: $OS ($OS_FAMILY)"
 
-COMMON_PACKAGES="unzip wget curl jq"
+COMMON_PACKAGES="unzip wget curl jq docker.io"
 
 install_on_debian() {
   sudo apt-get update -y
   sudo apt-get install -y gnupg software-properties-common $COMMON_PACKAGES python3 python3-venv python3-pip
-
+  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+  unzip -o awscliv2.zip
+  sudo ./aws/install
+  sudo systemctl enable docker
+  sudo systemctl start docker
+      
   # Add HashiCorp GPG key (idempotent)
   if [ ! -f /usr/share/keyrings/hashicorp-archive-keyring.gpg ]; then
     wget -qO- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
@@ -39,7 +44,7 @@ install_on_debian() {
 
   sudo apt-get update -y
   sudo apt-get install -y ansible
-}
+ }
 
 install_on_rpm() {
   # Use dnf if present otherwise yum

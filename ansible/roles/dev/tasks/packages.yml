@@ -9,6 +9,7 @@
     - tree
     - gnupg
     - software-properties-common
+    - unzip
   when: ansible_os_family == "Debian"
 - name: Install common packages on RedHat
   yum:
@@ -20,4 +21,5 @@
     - curl
     - tree
     - gnupg
+    - unzip
   when: ansible_os_family == "RedHat"

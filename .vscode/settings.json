@@ -1,3 +1,4 @@
 {
-    "ansible.python.interpreterPath": "c:\\Program Files\\Python311\\python.exe"
+    "ansible.python.interpreterPath": "c:\\Program Files\\Python311\\python.exe",
+    "ansible.validation.lint.path": "ansible-lint"
 }

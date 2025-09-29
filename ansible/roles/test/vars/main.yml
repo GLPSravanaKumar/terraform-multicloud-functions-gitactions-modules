@@ -1,0 +1,11 @@
+packages_to_install:
+  - openjdk-21-jdk
+  - curl
+  - htop
+  - unzip
+AWS_REGION: "us-east-1"
+AWS_ACCOUNT_ID: "593793035673"
+ECR_REPO_HOST: "{{ AWS_ACCOUNT_ID }}.dkr.ecr.{{ AWS_REGION }}.amazonaws.com"
+ECR_REPO_URL: "{{ ECR_REPO_HOST }}/{{ REPO_NAME }}"
+ECR_IMAGE: "{{ ECR_REPO_URL }}:latest"
+REPO_NAME: "ansible"

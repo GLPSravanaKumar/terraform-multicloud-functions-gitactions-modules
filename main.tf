@@ -81,18 +81,19 @@ module "aws_security_groups" {
 }
 
 module "aws_ec2_ansible-controller" {
-  source               = "./modules/aws_ec2"
-  public_subnet_cidrs  = distinct(var.public_subnet_cidrs)
-  public_subnet_ids    = module.aws_subnets.public_subnet_ids
-  pub_sg_id            = module.aws_security_groups.pub_sg_id
-  instance_type        = var.instance_type
-  ami                  = lookup(local.ami_map, var.ami)
-  key_name             = aws_key_pair.glpskey.key_name
-  private_subnet_cidrs = distinct(var.private_subnet_cidrs)
-  private_subnet_ids   = module.aws_subnets.private_subnet_ids
-  private_sg_id        = module.aws_security_groups.private_sg_id
-  user_data            = lookup(local.user_data, var.ami)
-  department           = title("ansible-controller")
+  source                       = "./modules/aws_ec2"
+  public_subnet_cidrs          = distinct(var.public_subnet_cidrs)
+  public_subnet_ids            = module.aws_subnets.public_subnet_ids
+  pub_sg_id                    = module.aws_security_groups.pub_sg_id
+  instance_type                = var.instance_type
+  ami                          = lookup(local.ami_map, var.ami)
+  key_name                     = aws_key_pair.glpskey.key_name
+  private_subnet_cidrs         = distinct(var.private_subnet_cidrs)
+  private_subnet_ids           = module.aws_subnets.private_subnet_ids
+  private_sg_id                = module.aws_security_groups.private_sg_id
+  ansible_ecr_instance_profile = module.aws_iam.ansible_ecr_instance_profile
+  user_data                    = lookup(local.user_data, var.ami)
+  department                   = title("ansible-controller")
 }
 module "aws_subnets_dev" {
   source = "./modules/aws_subnets"
@@ -123,46 +124,49 @@ module "aws_subnets_qa" {
 }
 
 module "aws_ec2_dev" {
-  source               = "./modules/aws_ec2"
-  public_subnet_cidrs  = var.dev_public_subnet_cidrs
-  private_subnet_cidrs = distinct([])
-  public_subnet_ids    = module.aws_subnets_dev.public_subnet_ids
-  pub_sg_id            = module.aws_security_groups.pub_sg_id
-  instance_type        = "t2.micro"
-  ami                  = lookup(local.ami_map, var.ami)
-  key_name             = aws_key_pair.glpskey.key_name
-  private_subnet_ids   = module.aws_subnets_dev.private_subnet_ids
-  private_sg_id        = module.aws_security_groups.private_sg_id
-  user_data            = lookup(local.user_data, var.ami)
-  department           = title("dev")
+  source                       = "./modules/aws_ec2"
+  public_subnet_cidrs          = var.dev_public_subnet_cidrs
+  private_subnet_cidrs         = distinct([])
+  public_subnet_ids            = module.aws_subnets_dev.public_subnet_ids
+  pub_sg_id                    = module.aws_security_groups.pub_sg_id
+  instance_type                = "t2.micro"
+  ami                          = lookup(local.ami_map, var.ami)
+  key_name                     = aws_key_pair.glpskey.key_name
+  private_subnet_ids           = module.aws_subnets_dev.private_subnet_ids
+  private_sg_id                = module.aws_security_groups.private_sg_id
+  ansible_ecr_instance_profile = module.aws_iam.ansible_ecr_instance_profile
+  user_data                    = lookup(local.user_data, var.ami)
+  department                   = title("dev")
 }
 module "aws_ec2_test" {
-  source               = "./modules/aws_ec2"
-  public_subnet_cidrs  = var.test_public_subnet_cidrs
-  private_subnet_cidrs = distinct([])
-  public_subnet_ids    = module.aws_subnets_test.public_subnet_ids
-  pub_sg_id            = module.aws_security_groups.pub_sg_id
-  instance_type        = "t2.micro"
-  ami                  = lookup(local.ami_map, var.ami)
-  key_name             = aws_key_pair.glpskey.key_name
-  private_subnet_ids   = module.aws_subnets_test.private_subnet_ids
-  private_sg_id        = module.aws_security_groups.private_sg_id
-  user_data            = lookup(local.user_data, var.ami)
-  department           = title("test")
+  source                       = "./modules/aws_ec2"
+  public_subnet_cidrs          = var.test_public_subnet_cidrs
+  private_subnet_cidrs         = distinct([])
+  public_subnet_ids            = module.aws_subnets_test.public_subnet_ids
+  pub_sg_id                    = module.aws_security_groups.pub_sg_id
+  instance_type                = "t2.micro"
+  ami                          = lookup(local.ami_map, var.ami)
+  key_name                     = aws_key_pair.glpskey.key_name
+  private_subnet_ids           = module.aws_subnets_test.private_subnet_ids
+  private_sg_id                = module.aws_security_groups.private_sg_id
+  ansible_ecr_instance_profile = module.aws_iam.ansible_ecr_instance_profile
+  user_data                    = lookup(local.user_data, var.ami)
+  department                   = title("test")
 }
 module "aws_ec2_qa" {
-  source               = "./modules/aws_ec2"
-  public_subnet_cidrs  = var.qa_public_subnet_cidrs
-  private_subnet_cidrs = distinct([])
-  public_subnet_ids    = module.aws_subnets_qa.public_subnet_ids
-  pub_sg_id            = module.aws_security_groups.pub_sg_id
-  instance_type        = "t2.micro"
-  ami                  = lookup(local.ami_map, var.ami)
-  key_name             = aws_key_pair.glpskey.key_name
-  private_subnet_ids   = module.aws_subnets_qa.private_subnet_ids
-  private_sg_id        = module.aws_security_groups.private_sg_id
-  user_data            = lookup(local.user_data, var.ami)
-  department           = title("qa")
+  source                       = "./modules/aws_ec2"
+  public_subnet_cidrs          = var.qa_public_subnet_cidrs
+  private_subnet_cidrs         = distinct([])
+  public_subnet_ids            = module.aws_subnets_qa.public_subnet_ids
+  pub_sg_id                    = module.aws_security_groups.pub_sg_id
+  instance_type                = "t2.micro"
+  ami                          = lookup(local.ami_map, var.ami)
+  key_name                     = aws_key_pair.glpskey.key_name
+  private_subnet_ids           = module.aws_subnets_qa.private_subnet_ids
+  private_sg_id                = module.aws_security_groups.private_sg_id
+  ansible_ecr_instance_profile = module.aws_iam.ansible_ecr_instance_profile
+  user_data                    = lookup(local.user_data, var.ami)
+  department                   = title("qa")
 }
 module "local_file" {
   source                            = "./modules/local_file"
@@ -191,6 +195,9 @@ module "aws_igw" {
   source     = "./modules/aws_igw"
   vpc_id     = module.aws_vpc.vpc_id
   department = title(var.department)
+}
+module "aws_iam" {
+  source = "./modules/aws_iam"
 }
 
 /* module "aws_launchtemplate" {

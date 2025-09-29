@@ -160,3 +160,6 @@ output "alb_sg_id" {
   value = module.aws_loadbalancer.lb_arn
 }
  */
+output "ansible_ecr_instance_profile" {
+  value = module.aws_iam.ansible_ecr_instance_profile
+}

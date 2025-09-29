@@ -6,6 +6,7 @@ resource "aws_instance" "public_servers" {
   subnet_id                   = element(var.public_subnet_ids, count.index)
   associate_public_ip_address = true
   vpc_security_group_ids      = [var.pub_sg_id]
+  iam_instance_profile        = var.ansible_ecr_instance_profile
   user_data                   = var.user_data
   tags = {
     Name = "${var.department}-public_webserver-${count.index + 1}"
