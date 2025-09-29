@@ -8,6 +8,6 @@ RUN apt-get update && \
 # Copy built site (ensure your CI builds into ./build)
 COPY . /var/www/html/
 
-EXPOSE 80
+EXPOSE 81
 
 CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]

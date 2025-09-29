@@ -68,37 +68,6 @@
     append: yes
   ignore_errors: true
 
-# Install AWS CLI v2
-- name: Install AWS CLI v2
-  shell: |
-    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-    unzip -o awscliv2.zip
-    sudo ./aws/install --update
-  args:
-    creates: /usr/local/bin/aws
-
-# Login to AWS ECR
-- name: Login to ECR (Docker login)
-  ansible.builtin.shell: |
-    aws ecr get-login-password --region {{ AWS_REGION }} | docker login --username AWS \ 
-    --password-stdin {{ ECR_REPO_HOST }}
-
-# Pull Docker image from ECR
-- name: Pull image from ECR
-  community.docker.docker_image:
-    name: "{{ ECR_IMAGE }}"
-    source: pull
-
-# Run Docker container
-- name: Run container
-  community.docker.docker_container:
-    name: frontend_web
-    image: "{{ ECR_IMAGE }}"
-    state: started
-    restart_policy: always
-    published_ports:
-      - "80:80"
-
 # Verify Docker works
 - name: Verify Docker installation
   ansible.builtin.command: docker --version
