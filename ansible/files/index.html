@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Play & Fit — Login</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:0;background:#f2f6fb}
+    header{background:#0b63d8;color:#fff;padding:1rem}
+    .container{max-width:720px;margin:2rem auto;padding:1.5rem;background:#fff;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.06)}
+    form{display:grid;gap:.75rem}
+    label{font-weight:600}
+    input[type="text"],input[type="password"]{padding:.6rem;border:1px solid #d7dbe6;border-radius:6px;width:100%}
+    button{background:#0b63d8;color:#fff;border:0;padding:.7rem;border-radius:6px;font-weight:700;cursor:pointer}
+    .links{display:flex;justify-content:space-between;margin-top:.5rem;font-size:.9rem}
+    nav a{color:#fff;text-decoration:none;margin-right:1rem}
+    footer{margin-top:1rem;text-align:center;color:#666;font-size:.9rem}
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/about.html">About</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <h1>Welcome — Login</h1>
+    <p>Enter your credentials to access the Play & Fit dashboard.</p>
+
+    <form method="post" action="/login">
+      <label for="username">Mobile / Username</label>
+      <input id="username" name="username" type="text" placeholder="e.g., 9876543210" required>
+
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" placeholder="password" required>
+
+      <div class="links">
+        <a href="/about.html">About</a>
+        <a href="#">Forgot?</a>
+      </div>
+
+      <button type="submit">Sign In</button>
+    </form>
+
+    <footer>
+      <small>Site served by nginx • © Play & Fit</small>
+    </footer>
+  </div>
+</body>
+</html>
+

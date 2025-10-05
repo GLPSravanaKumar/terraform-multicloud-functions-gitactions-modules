@@ -7,12 +7,12 @@ bucket_name              = "uhg-s3-backend-table"
 public_subnet_cidrs      = ["10.0.1.0/24"]
 private_subnet_cidrs     = []
 vpc_cidr_block           = "10.0.0.0/16"
-instance_type            = "t2.medium"
+instance_type            = "t2.micro"
 ami                      = "ubuntu"
 department               = "uhg"
-dev_public_subnet_cidrs  = ["10.0.25.0/24"]
+dev_public_subnet_cidrs  = ["10.0.10.0/24"]
 test_public_subnet_cidrs = []
-qa_public_subnet_cidrs   = ["10.0.40.0/24"]
+qa_public_subnet_cidrs   = []
 
 /* lb_type               = "application"
 instance_profile_role = "ec2-readonly"

@@ -27,8 +27,9 @@ provider "aws" {
   profile = "optum"
   default_tags {
     tags = {
-      Environment = "Dev"
-      Cient       = upper("optum")
+      Process = "Behavioural Health_UBH"
+      Cient   = "OPTUM"
+      Project = "ansible-aws-ec2plugin"
     }
   }
 }

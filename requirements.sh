@@ -18,33 +18,72 @@ COMMON_PACKAGES="unzip wget curl jq docker.io"
 
 install_on_debian() {
   sudo apt-get update -y
-  sudo apt-get install -y gnupg software-properties-common $COMMON_PACKAGES python3 python3-venv python3-pip
-  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-  unzip -o awscliv2.zip
-  sudo ./aws/install
-  sudo systemctl enable docker
-  sudo systemctl start docker
-      
-  # Add HashiCorp GPG key (idempotent)
+
+  # Loop through each package and install only if missing
+  for pkg in $COMMON_PACKAGES python3 python3-venv python3-pip ansible; do
+    if ! dpkg -s "$pkg" >/dev/null 2>&1; then
+      echo "Installing missing package: $pkg"
+      sudo apt-get install -y "$pkg"
+    else
+      echo "Package $pkg already installed, skipping."
+    fi
+  done
+
+  # Install AWS CLI v2 only if not found
+  if ! command -v aws >/dev/null 2>&1; then
+    echo "Installing AWS CLI v2"
+    curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    unzip -o awscliv2.zip
+    sudo ./aws/install
+  else
+    echo "AWS CLI already installed, updating..."
+    curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    unzip -o awscliv2.zip
+    sudo ./aws/install --update
+  fi
+
+  # Ensure boto3/botocore (idempotent)
+  if ! pip show boto3 >/dev/null 2>&1; then
+    pip install boto3 botocore
+  else
+    echo "Python boto3/botocore already installed, skipping."
+  fi
+
+  # Enable Docker
+  sudo systemctl enable docker || true
+  sudo systemctl start docker || true
+
+  # Add HashiCorp GPG key if not already present
   if [ ! -f /usr/share/keyrings/hashicorp-archive-keyring.gpg ]; then
     wget -qO- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
   fi
 
-  # Add repo (idempotent)
-  UBUNTU_CODENAME="$(. /etc/os-release && echo "${UBUNTU_CODENAME:-}")"
-  if [ -z "$UBUNTU_CODENAME" ]; then
-    # fallback to lsb_release if available
-    if command -v lsb_release >/dev/null 2>&1; then
-      UBUNTU_CODENAME="$(lsb_release -cs)"
-    else
-      UBUNTU_CODENAME="stable"
+  # Add HashiCorp repo if not already added
+  if [ ! -f /etc/apt/sources.list.d/hashicorp.list ]; then
+    UBUNTU_CODENAME="$(. /etc/os-release && echo "${UBUNTU_CODENAME:-}")"
+    if [ -z "$UBUNTU_CODENAME" ]; then
+      if command -v lsb_release >/dev/null 2>&1; then
+        UBUNTU_CODENAME="$(lsb_release -cs)"
+      else
+        UBUNTU_CODENAME="stable"
+      fi
     fi
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com ${UBUNTU_CODENAME} main" | sudo tee /etc/apt/sources.list.d/hashicorp.list > /dev/null
+    sudo apt-get update -y
   fi
-  echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com ${UBUNTU_CODENAME} main" | sudo tee /etc/apt/sources.list.d/hashicorp.list > /dev/null
+}
 
-  sudo apt-get update -y
-  sudo apt-get install -y ansible
- }
+# Run installer for Debian/Ubuntu
+case "$OS" in
+  ubuntu|debian)
+    install_on_debian
+    ;;
+  *)
+    echo "Unsupported OS: $OS"
+    exit 1
+    ;;
+esac
+
 
 install_on_rpm() {
   # Use dnf if present otherwise yum

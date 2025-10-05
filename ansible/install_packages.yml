@@ -17,11 +17,13 @@
       register: apt_update_result
       until: apt_update_result is succeeded
       when: ansible_os_family == "Debian"
+      no_log: true
 
     - name: Update yum/dnf cache
       yum:
         update_cache: yes
       when: ansible_os_family == "RedHat"
+      no_log: true
 
     - name: Upgrade base packages
       apt:
@@ -43,6 +45,10 @@
           {% for m in ansible_mounts %}
           - {{ m.mount }}: {{ m.size_total | int // 1024 // 1024 }} MB
           {% endfor %}
+    - name: print variable sensitive
+      debug:
+        msg: Hostname:{{ ansible_hostname }}
+      no_log: true
 
 
       

@@ -70,7 +70,7 @@ resource "null_resource" "configure_server" {
 
       "cd ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible",
 
-      "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/inventory_file.ini install_packages.yml",
+      /* "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/inventory_file.ini install_packages.yml",
 
       "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/inventories/dev/dev_hosts.ini ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/playbooks/dev.yml",
 
@@ -78,7 +78,7 @@ resource "null_resource" "configure_server" {
 
       "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/inventories/qa/qa_hosts.ini ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/playbooks/qa.yml",
 
-      "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/inventory_file.ini gather_facts.yml"
+      "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/inventory_file.ini gather_facts.yml" */
 
     ]
 
