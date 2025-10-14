@@ -11,3 +11,4 @@
       {% for m in ansible_mounts %}
       - {{ m.mount }}: {{ m.size_total | int // 1024 // 1024 }} MB
       {% endfor %}
+  

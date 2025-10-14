@@ -1,0 +1,25 @@
+group_list:
+  - modelchange
+  - investigation
+users:
+  - {
+      name: "vinitha",
+      groups: ["modelchange"],
+      password: "{{ 'Vinitha@123' | password_hash('sha512') }}",
+    }
+  #sudo apt install python3-passlib -y ( for password_hash filter it is required)
+  - {
+      name: "sravan",
+      groups: ["modelchange"],
+      password: "{{ 'Sravan@123' | password_hash('sha512') }}",
+    }
+  - {
+      name: "bhadra",
+      groups: ["investigation"],
+      password: "{{ 'Bhadra@123' | password_hash('sha512') }}",
+    }
+  - {
+      name: "naga",
+      groups: ["investigation"],
+      password: "{{ 'Naga@123' | password_hash('sha512') }}",
+    }

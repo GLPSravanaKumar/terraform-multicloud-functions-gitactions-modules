@@ -1,0 +1,26 @@
+- name: Remove unwanted users
+  hosts: Role_dev
+  become: yes
+  gather_facts: true
+
+  vars:
+    users_to_delete:
+      - vinitha
+      - sravan
+      - bhadra
+      - naga
+
+  tasks:
+    - name: Delete specified users
+      user:
+        name: "{{ item }}"
+        state: absent
+        remove: yes
+      register: users_check
+      loop: "{{ users_to_delete }}"
+      ignore_errors: true
+    
+    - name: confiration user deletion message
+      debug:
+        msg: "User {{ item.item }} is deleted"
+      loop: "{{ users_check.results }}"

@@ -6,6 +6,8 @@
     - qa_public_servers
   become: true
   gather_facts: yes
+  vars:
+    slack_webhook_url: https://hooks.slack.com/services/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
 
   tasks:
     - name: Update apt cache
@@ -41,14 +43,27 @@
           Kernel: {{ ansible_kernel }}
           CPU Cores: {{ ansible_processor_cores }}
           RAM: {{ ansible_memory_mb.real.total }} MB
-          Disks:
-          {% for m in ansible_mounts %}
-          - {{ m.mount }}: {{ m.size_total | int // 1024 // 1024 }} MB
-          {% endfor %}
+          
     - name: print variable sensitive
       debug:
         msg: Hostname:{{ ansible_hostname }}
       no_log: true
+    
+    - name: Send metrics to Slack
+      uri:
+        url: "{{ slack_webhook_url }}"
+        method: POST
+        body_format: json
+        body: |
+          {
+            "text": "*Server:* {{ ansible_hostname }}\n
+                      *CPU Usage:* {{ ansible_processor_cores }} %\n
+                      *Memory Usage:* {{ ansible_memory_mb.real.total }} %\n
+                      *IP:* {{ ansible_default_ipv4.address }}"
+          }
+        headers:
+          Content-Type: "application/json"
+
 
 
       

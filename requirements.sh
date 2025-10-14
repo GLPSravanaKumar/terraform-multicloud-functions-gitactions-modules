@@ -1,6 +1,17 @@
 #!/bin/bash
 set -euo pipefail
 set -x
+set -e
+
+# Function to wait for apt lock (Debian/Ubuntu)
+wait_for_apt() {
+  while sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1 || \
+        sudo fuser /var/lib/apt/lists/lock >/dev/null 2>&1 || \
+        sudo fuser /var/lib/dpkg/lock >/dev/null 2>&1; do
+    echo "Waiting for another apt process to finish..."
+    sleep 5
+  done
+}
 
 # Detect OS
 if [ -f /etc/os-release ]; then
@@ -17,19 +28,24 @@ echo "Detected OS: $OS ($OS_FAMILY)"
 COMMON_PACKAGES="unzip wget curl jq docker.io"
 
 install_on_debian() {
+  wait_for_apt
   sudo apt-get update -y
 
-  # Loop through each package and install only if missing
-  for pkg in $COMMON_PACKAGES python3 python3-venv python3-pip ansible; do
+  
+  for pkg in $COMMON_PACKAGES software-properties-common python3 python3-boto3 python3-botocore python3-venv python3-passlib python3-pip ; do
     if ! dpkg -s "$pkg" >/dev/null 2>&1; then
       echo "Installing missing package: $pkg"
+      wait_for_apt
       sudo apt-get install -y "$pkg"
     else
       echo "Package $pkg already installed, skipping."
     fi
   done
+  sudo add-apt-repository --yes --update ppa:ansible/ansible
+  sudo apt install ansible -y
+  
 
-  # Install AWS CLI v2 only if not found
+  # AWS CLI v2
   if ! command -v aws >/dev/null 2>&1; then
     echo "Installing AWS CLI v2"
     curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
@@ -41,64 +57,43 @@ install_on_debian() {
     unzip -o awscliv2.zip
     sudo ./aws/install --update
   fi
+  sudo rm -rf /home/ubuntu/aws
+  sudo rm -rf /home/ubuntu/awscliv2.zip
 
-  # Ensure boto3/botocore (idempotent)
+  # Python boto3/botocore
   if ! pip show boto3 >/dev/null 2>&1; then
     pip install boto3 botocore
   else
     echo "Python boto3/botocore already installed, skipping."
   fi
 
-  # Enable Docker
-  sudo systemctl enable docker || true
-  sudo systemctl start docker || true
+  # Docker enable/start
+  sudo systemctl enable --now docker || true
 
-  # Add HashiCorp GPG key if not already present
+  # HashiCorp GPG key & repo (idempotent)
   if [ ! -f /usr/share/keyrings/hashicorp-archive-keyring.gpg ]; then
     wget -qO- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
   fi
 
-  # Add HashiCorp repo if not already added
   if [ ! -f /etc/apt/sources.list.d/hashicorp.list ]; then
-    UBUNTU_CODENAME="$(. /etc/os-release && echo "${UBUNTU_CODENAME:-}")"
-    if [ -z "$UBUNTU_CODENAME" ]; then
-      if command -v lsb_release >/dev/null 2>&1; then
-        UBUNTU_CODENAME="$(lsb_release -cs)"
-      else
-        UBUNTU_CODENAME="stable"
-      fi
-    fi
+    UBUNTU_CODENAME="$(lsb_release -cs || echo 'stable')"
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com ${UBUNTU_CODENAME} main" | sudo tee /etc/apt/sources.list.d/hashicorp.list > /dev/null
+    wait_for_apt
     sudo apt-get update -y
   fi
 }
 
-# Run installer for Debian/Ubuntu
-case "$OS" in
-  ubuntu|debian)
-    install_on_debian
-    ;;
-  *)
-    echo "Unsupported OS: $OS"
-    exit 1
-    ;;
-esac
-
-
 install_on_rpm() {
-  # Use dnf if present otherwise yum
   PM="yum"
   if command -v dnf >/dev/null 2>&1; then
     PM="dnf"
   fi
 
   sudo ${PM} -y update || true
-  # Install basic utils
   sudo ${PM} -y install yum-utils $COMMON_PACKAGES python3 python3-pip || true
 
-  # Add HashiCorp repo (idempotent)
+  # HashiCorp repo
   if [ ! -f /etc/yum.repos.d/hashicorp.repo ]; then
-    # Try to create a generic hashicorp.repo compatible with RHEL/CentOS/Amazon Linux
     cat <<'EOF' | sudo tee /etc/yum.repos.d/hashicorp.repo > /dev/null
 [hashicorp]
 name=HashiCorp Stable - $basearch
@@ -108,35 +103,28 @@ gpgcheck=1
 gpgkey=https://rpm.releases.hashicorp.com/gpg
 EOF
   fi
-
-  # Refresh metadata
   sudo ${PM} makecache || true
 
-  # Install terraform via repo. If not present, try adding repo via yum-config-manager
+  # Terraform install
   if ! sudo ${PM} -y install terraform; then
-    if command -v yum-config-manager >/dev/null 2>&1; then
-      sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo || true
-    fi
     sudo ${PM} -y install terraform || true
   fi
 
-  # Install docker
-  # Amazon Linux may use 'docker' or 'docker-ce'. Use package available
-  sudo ${PM} -y install docker || sudo ${PM} -y install docker.io || true
+  sudo add-${PM}-repository --yes --update ppa:ansible/ansible
 
-  # Try to install ansible via package manager first
+  # Docker & Ansible
+  sudo ${PM} -y install docker || sudo ${PM} -y install docker.io || true
   if ! sudo ${PM} -y install ansible; then
-    # On RHEL, install EPEL or fallback to pip-based install
-    echo "Package 'ansible' not available via ${PM}. Trying pip install (ansible-core + ansible)."
     sudo python3 -m pip install --upgrade pip setuptools wheel
     sudo python3 -m pip install --upgrade "ansible-core>=2.15" ansible
-    # ensure ansible-playbook is on PATH (pip usually puts under /usr/local/bin)
     export PATH="$PATH:/usr/local/bin"
   fi
+  sudo rm -rf /home/ubuntu/aws
+  sudo rm -rf /home/ubuntu/awscliv2.zip
+  sudo systemctl enable --now docker || true
 }
 
-# Decide which function to run
-# Match common families: debian, ubuntu -> apt; rhel/centos/fedora/amzn/amazon -> rpm
+# Decide installer
 case "${OS_FAMILY,,}:${OS,,}" in
   *debian*:* | *ubuntu*:* | *:ubuntu*)
     install_on_debian
@@ -145,7 +133,6 @@ case "${OS_FAMILY,,}:${OS,,}" in
     install_on_rpm
     ;;
   *)
-    # try a more permissive match: if OS contains 'rhel' or 'centos' or 'amzn' treat as rpm
     if [[ "${OS,,}" =~ rhel|centos|amzn|amazon|fedora ]]; then
       install_on_rpm
     elif [[ "${OS_FAMILY,,}" =~ debian|ubuntu ]]; then
@@ -157,18 +144,7 @@ case "${OS_FAMILY,,}:${OS,,}" in
     ;;
 esac
 
-# Start & enable docker if installed
-if command -v systemctl >/dev/null 2>&1 && systemctl list-unit-files | grep -q docker; then
-  sudo systemctl enable --now docker || true
-fi
-
-# quick sanity checks
-echo "terraform: $(command -v terraform || echo 'NOT FOUND')"
-echo "ansible: $(command -v ansible || echo 'NOT FOUND')"
-echo "ansible-playbook: $(command -v ansible-playbook || echo 'NOT FOUND')"
-
-# Hostname setup (Terraform null_resource count aware)
-# count_index should be present in environment by Terraform remote-exec
+# Hostname setup for Terraform null_resource
 INDEX=$(( ${count_index:-0} + 1 ))
 if [[ "$HOSTNAME" == *"public"* ]]; then
   sudo hostnamectl set-hostname "public-server-${INDEX}"
@@ -177,3 +153,6 @@ else
 fi
 
 echo "Bootstrap complete."
+echo "terraform: $(command -v terraform || echo 'NOT FOUND')"
+echo "ansible: $(command -v ansible || echo 'NOT FOUND')"
+echo "ansible-playbook: $(command -v ansible-playbook || echo 'NOT FOUND')"

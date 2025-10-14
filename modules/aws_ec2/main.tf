@@ -7,7 +7,10 @@ resource "aws_instance" "public_servers" {
   associate_public_ip_address = true
   vpc_security_group_ids      = [var.pub_sg_id]
   iam_instance_profile        = var.ansible_ecr_instance_profile
-  user_data                   = var.user_data
+  metadata_options {
+    http_tokens = "optional"
+  }
+  user_data = var.user_data
   tags = {
     Name = "${var.department}-public_webserver-${count.index + 1}"
     Role = var.department == "Ansible-Controller" ? "controller" : var.department == "Dev" ? "dev" : var.department == "Test" ? "test" : "unknown"

@@ -10,19 +10,24 @@
       shell: aws --version
       register: aws_version_output
       ignore_errors: true
+      tags: aws_version
     - name: Print the return code (rc) AwsCli
       debug:
         msg: "Return code (rc): {{ aws_version_output.rc }}"
+      tags: aws_rc
     - name: Check Unzip Status
       shell: unzip
       register: unzip_version_output
       ignore_errors: true
+      tags: unzip_version
     - name: Print thr Return Code (rc) of Unzip
       debug:
         msg: "Return code (rc): {{ unzip_version_output.rc }}"
+      tags: unzip_rc
     - name: Install Dependencies
       shell: apt update && apt install unzip -y
       when: (aws_version_output.rc != 0) or (unzip_version_output.rc !=0)
+      tags: dependency
     - name: Install AWS CLI v2
       shell: |
         curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
@@ -31,7 +36,8 @@
       args:
         creates: /usr/local/bin/aws
       when: aws_version_output.rc != 0
+      tags: aws_install
     - name: Remove Aws Awscli.zip Directories 
       shell: rm -rf /home/ubuntu/aws awscliv2.zip
       when: aws_version_output.rc != 0
-    
+      tags: rm

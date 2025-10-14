@@ -1,0 +1,5 @@
+mysql_root_password: "unitedhealth@!"
+db_name: "optum"
+db_user: "glps"
+db_user_password: "glpskumar@!"
+    

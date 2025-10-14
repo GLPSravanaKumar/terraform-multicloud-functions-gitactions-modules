@@ -64,14 +64,17 @@ resource "null_resource" "configure_server" {
 
       # Ensure Ansible uses the correct key
       "export ANSIBLE_PRIVATE_KEY_FILE=/home/ubuntu/.ssh/id_ed25519_glpskumar",
+      "export ANSIBLE_CONFIG=/home/ubuntu/ansible/ansible.cfg",
+      "export ANSIBLE_HOST_KEY_CHECKING=False",
 
       # Ping all servers from inventory
       "ANSIBLE_HOST_KEY_CHECKING=False ansible -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/inventory_file.ini public_servers -m ping",
 
       "cd ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible",
 
-      /* "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/inventory_file.ini install_packages.yml",
+      "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/inventory_file.ini install_packages.yml",
 
+      /* 
       "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/inventories/dev/dev_hosts.ini ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/playbooks/dev.yml",
 
       "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/inventories/test/test_hosts.ini ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/playbooks/test.yml",

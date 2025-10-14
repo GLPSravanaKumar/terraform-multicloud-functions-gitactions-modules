@@ -1,0 +1,73 @@
+---
+- name: Create AWS RDS MySQL Database
+  hosts: localhost
+  connection: local
+  gather_facts: yes
+
+  vars:
+    db_instance_id: "my-mysql-db"
+    db_engine: "mysql"
+    db_engine_version: "8.0.41"
+    db_instance_class: "db.t3.micro"
+    db_name: "cricket_booking"
+    db_username: "admin"
+    db_password: "Admin#12345"
+    db_allocated_storage: 20
+    db_vpc_security_group_ids: ["sg-0eced4d2f23530c18"]  # Replace with your SG ID
+    db_subnet_group_name: "Uhg-db-subnet"          # Replace with your subnet group name
+    db_region: "us-east-1"
+    subnets: 
+      - id: "subnet-0ff9ccf8b5880d5a6"
+      - id: "subnet-0b6c92d3e7b1e4f4f"
+    vpc_id: "vpc-05fbf0d44db7c89a0"
+        
+  tasks:
+    - name: Update apt packages
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: Install Python3 and pip
+      ansible.builtin.apt:
+        name:
+          - python3
+          - python3-pip
+        state: present
+
+    - name: Ensure Ansible Galaxy is available
+      ansible.builtin.command:
+        cmd: ansible-galaxy collection install amazon.aws
+      args:
+        creates: "~/.ansible/collections/ansible_collections/amazon/aws"
+      register: galaxy_result
+      changed_when: "'Skipping' not in galaxy_result.stdout"
+
+    - name: Create RDS Subnet Group
+      amazon.aws.rds_subnet_group:
+        state: present
+        name: "{{ db_subnet_group_name }}"
+        description: "Subnet group for RDS MySQL"
+        subnets: "{{ subnets | map(attribute='id') | list }}"
+        region: "{{ db_region }}"
+
+    - name: Create RDS MySQL instance
+      amazon.aws.rds_instance:
+        db_instance_identifier: "{{ db_instance_id }}"
+        engine: "{{ db_engine }}"
+        engine_version: "{{ db_engine_version }}"
+        db_instance_class: "{{ db_instance_class }}"
+        allocated_storage: "{{ db_allocated_storage }}"
+        db_name: "{{ db_name }}"
+        master_username: "{{ db_username }}"
+        master_user_password: "{{ db_password }}"
+        vpc_security_group_ids: "{{ db_vpc_security_group_ids }}"
+        db_subnet_group_name: "{{ db_subnet_group_name }}"
+        multi_az: false
+        publicly_accessible: true
+        storage_type: "gp2"
+        region: "{{ db_region }}"
+        state: present
+      register: rds_output
+
+    - name: Print RDS endpoint
+      ansible.builtin.debug:
+        msg: "RDS Endpoint: {{ rds_output.db_instance.endpoint.address }}"

@@ -1,0 +1,11 @@
+- name: copy sctipt
+  hosts: Role_dev
+  gather_facts: true
+  become: yes
+  tasks:
+    - name: copy files form remote ansible controller to node server
+      copy:
+        src: /home/ubuntu/tasks
+        dest: /home/ubuntu/
+        owner: ubuntu
+      

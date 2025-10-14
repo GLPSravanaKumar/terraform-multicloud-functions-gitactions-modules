@@ -1,0 +1,82 @@
+- name: Install and configure Nginx
+  hosts: Role_dev
+  gather_facts: true
+  become: yes
+  vars:
+    packages:
+      - nginx
+      - git
+      - curl
+    web_root: /var/www/html
+  tasks:
+    - name: Check Status of packages
+      shell: dpkg -l "{{ item }}"
+      loop: "{{ packages }}"
+      register: package_status
+      ignore_errors: true
+    - name: Show package status
+      debug:
+        msg: "{{ item.item }} is {{ 'installed' if item.rc == 0 else 'not installed' }}"
+      loop: "{{ package_status.results }}"
+    - name: Install packages
+      apt:
+        name: "{{ item.item }}"
+        state: present
+        update_cache: yes
+      loop: "{{ package_status.results }}"
+      when: item.rc != 0
+    - name: Enabling nginx service
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+      when: " 'nginx' in packages"
+    - name: checking default nginx webapp file
+      shell:
+        ls /var/www/html/index.nginx-debian.html
+      register: nginx_default_file
+      ignore_errors: true
+    - name: remove default nginx webaplication file
+      shell:
+        rm /var/www/html/index.nginx-debian.html
+      when: nginx_default_file.rc == 0
+    - name: Recreate web root directory
+      file:
+        path: "{{ web_root }}"
+        state: directory
+        owner: www-data
+        group: www-data
+        mode: '0755'
+    - name: Mark web root as safe for Git
+      become: yes
+      command: git config --global --add safe.directory {{ web_root }}
+    - name: Source code from Netflix
+      git:
+        repo: "https://github.com/CleverProgrammers/pwj-netflix-clone.git"
+        dest: "{{ web_root }}"
+        version: master
+        force: yes
+    - name: Configure default Nginx site to serve Netflix app
+      copy:
+        dest: /etc/nginx/sites-available/default
+        content: |
+          server {
+              listen 80 default_server;
+              listen [::]:80 default_server;
+              root {{ web_root }};
+              index index.html;
+
+              server_name _;
+
+              location / {
+                  try_files $uri $uri/ =404;
+              }
+          }
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted
+
+    - name: Print deployment URL
+      debug:
+        msg: "Netflix Clone deployed successfully! Visit: http://{{ hostvars[inventory_hostname].public_ip }}/"

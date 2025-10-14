@@ -1,0 +1,16 @@
+plugin: amazon.aws.aws_ec2
+regions: us-east-1
+filters:
+  instance-state-name: running
+  "tag:Process": "Behavioural Health_UBH"
+keyed_groups:
+  - key: tags.Role
+    prefix: Role
+hostnames:
+  - private-ip-address
+
+#ake something that already exists in the source (like EC2 instance info) and make a new variable that I can use in my playbooks.
+compose:
+  ansible_user: ubuntu
+  ansible_ssh_private_key_file: /home/ubuntu/.ssh/id_ed25519_glpskumar
+  public_ip: public_ip_address

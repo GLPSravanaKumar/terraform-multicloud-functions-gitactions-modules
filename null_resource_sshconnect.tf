@@ -13,6 +13,6 @@ resource "local_file" "ssh_file" {
       "rosters_server_${idx + 1} : ssh -i \"C:\\Users\\Naga\\.ssh\\id_ed25519_glpskumar\" ubuntu@${ip}"
     ] */
   ))
-  filename = "${path.root}/ssh_connect_servers.txt"
+  filename = "${path.root}/ssh_connect_servers.txt "
 }
 

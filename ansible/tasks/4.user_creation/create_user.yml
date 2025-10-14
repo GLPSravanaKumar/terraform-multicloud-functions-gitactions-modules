@@ -1,0 +1,31 @@
+- name: Users creation
+  hosts: Role_dev
+  gather_facts: true
+  become: yes
+  vars:
+    users:
+      - vinitha
+      - sravan
+      - bhadra
+      - naga
+  tasks:  
+    - name: Creating users 
+      user:
+        name: dora
+        state: present
+        shell: /bin/bash
+    - name: creating multiple users
+      user: 
+        name: "{{ item }}"
+        state: present
+      loop: "{{ users }}"
+    - name: check user status
+      shell:
+        id "{{ item }}"
+      register: user_check
+      ignore_errors: true
+      loop: "{{ users }}"
+    - name: user availability
+      debug:
+        msg: "user {{item.item}} is {{ 'available' if item.rc == 0 else 'not available' }}"
+      loop: "{{ user_check.results }}"

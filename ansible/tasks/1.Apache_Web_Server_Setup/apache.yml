@@ -1,0 +1,32 @@
+- name: apache2 installation
+  hosts: Role_dev
+  gather_facts: yes
+  become: true
+  tasks:
+    - name: Check if apache2 is installed
+      shell: dpkg -l apache2
+      register: apache2
+      ignore_errors: true
+    - name: apache2 Status
+      debug:
+        msg: "apache2 is {{ 'installed' if apache2.rc==0 else 'not installed' }}"
+    - name: Installing apache2
+      apt:
+        name: apache2
+        state: present
+        update_cache: yes
+      when: apache2.rc !=0
+    - name: Enabling apache2 service
+      apt: 
+        name: apache2
+        state: started
+        enabled: yes
+      when: apache2.rc == 0
+    - name: Copy website files to web root 
+      copy:
+        src: files/
+        dest: /var/www/html/
+        owner: www-data
+        group: www-data
+        mode: '0644'
+

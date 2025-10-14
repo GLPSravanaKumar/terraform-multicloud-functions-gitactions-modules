@@ -1,0 +1,19 @@
+- name: copy sctipt
+  hosts: Role_dev
+  gather_facts: true
+  become: yes
+  tasks:
+  - name: Synchronize directory to remote host
+    ansible.posix.synchronize:
+      src: /home/ubuntu/tasks/2.Nginx/
+      dest: /home/ubuntu/
+      rsync_opts:
+      - "--exclude=.git"
+      recursive: no
+  
+  - name: Synchronize directory from remote host to controller
+    ansible.posix.synchronize:
+      mode: pull
+      src: /home/ubuntu/
+      dest: /home/ubuntu/tasks/2.Nginx/
+

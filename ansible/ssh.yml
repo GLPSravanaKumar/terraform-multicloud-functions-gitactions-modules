@@ -1,0 +1,11 @@
+- name: Servers SSH Connection
+  hosts: all
+  gather_facts: yes
+  become: true
+  vars:
+    path: "C:\\Users\\Naga\\.ssh\\id_ed25519_glpskumar"
+  tasks:
+    - name: Getting IP Information to connecting SSH
+      debug:
+        msg: ssh -i \"{{ path }}\" ubuntu@{{ ansible_default_ipv4.address }}
+
