@@ -3,7 +3,7 @@
 instance_id=$(curl http://169.254.169.254/latest/meta-data/instance-id)
 
 
-slack_web="https://hooks.slack.com/services/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"
+
 total_size=$(df -h | awk '$6 == "/" {print $2}')
 available_space=$(df -h | awk '$6== "/" {print $4}')
 echo "Total size is: $total_size and available space on the Root_drive : $available_space"
