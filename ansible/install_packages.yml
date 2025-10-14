@@ -7,7 +7,7 @@
   become: true
   gather_facts: yes
   vars:
-    slack_webhook_url: https://hooks.slack.com/services/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
+    slack_webhook_url: 
 
   tasks:
     - name: Update apt cache
