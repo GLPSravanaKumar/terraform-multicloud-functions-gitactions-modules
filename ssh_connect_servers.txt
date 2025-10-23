@@ -1,1 +1,0 @@
-ansible_controller_1 : ssh -i "C:\Users\Naga\.ssh\id_ed25519_glpskumar" ubuntu@3.228.8.91
