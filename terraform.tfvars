@@ -10,7 +10,7 @@ vpc_cidr_block           = "10.0.0.0/16"
 instance_type            = "t2.micro"
 ami                      = "ubuntu"
 department               = "uhg"
-dev_public_subnet_cidrs  = ["10.0.10.0/24"]
+dev_public_subnet_cidrs  = []
 test_public_subnet_cidrs = []
 qa_public_subnet_cidrs   = []
 

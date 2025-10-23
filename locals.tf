@@ -39,6 +39,7 @@ locals {
     apt-get install -y apache2
     systemctl start apache2
     systemctl enable apache2
+    touch /home/ubuntu/glps
     echo "<html>
     <head>
     <title>Welcome to My Web Server</title>
@@ -47,8 +48,8 @@ locals {
     <h1>Hello World from $(hostname -f)</h1>
     <p>This is Apache running on ubuntu
     </p>
-    <p>Instance ID: $(curl -s http://169.254.169.254/latest/meta-data/instance-id)</p>
-    <p>Availability Zone: $(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone)</p>
+    <p>Instance ID: $(curl -sL http:/169.254.169.254/latest/meta-data/instance-id)</p>
+    <p>Availability Zone: $(curl -sL http://169.254.169.254/latest/meta-data/placement/availability-zone)</p>
     </body>
     </html>" > /var/www/html/index.html
     EOT
@@ -67,11 +68,43 @@ locals {
     <h1>Hello World from $(hostname -f)</h1>
     <p>This is Apache running on Redhat
     </p>
-    <p>Instance ID: $(curl -s http://169.254.169.254/latest/meta-data/instance-id)</p>
-    <p>Availability Zone: $(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone)</p>
+    <p>Instance ID: $(curl -sL http:/169.254.169.254/latest/meta-data/instance-id)</p>
+    <p>Availability Zone: $(curl -sL http://169.254.169.254/latest/meta-data/placement/availability-zone)</p>
     </body>
     </html>" > /var/www/html/index.html
     EOT
   }
 
 }
+
+
+
+
+/* 
+#!/bin/bash
+(
+  sleep 30
+  apt-get update -y && apt-get upgrade -y
+) > /var/log/apt_background.log 2>&1 &
+apt-get install -y unzip curl
+curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip -o awscliv2.zip >/dev/null 2>&1
+sudo ./aws/install >/dev/null 2>&1 
+apt-get install -y apache2 
+systemctl start apache2
+systemctl enable apache2
+touch /home/ubuntu/glps
+echo "<html>
+<head>
+<title>Welcome to My Web Server</title>
+</head>
+<body>
+<h1>Hello World from $(hostname -f)</h1>
+<p>This is Apache running on ubuntu </p>
+<p>Instance ID: $(curl -sL http:/169.254.169.254/latest/meta-data/instance-id)</p>
+<p>Availability Zone: $(curl -sL http://169.254.169.254/latest/meta-data/placement/availability-zone)</p>
+</body>
+</html>" > /var/www/html/index.html
+ EOT
+*/
+

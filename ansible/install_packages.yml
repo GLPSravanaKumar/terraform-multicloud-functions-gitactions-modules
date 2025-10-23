@@ -1,0 +1,59 @@
+---
+- name: Install environment-specific packages
+  hosts:
+    - dev_public_servers
+    - test_public_servers
+    - qa_public_servers
+  become: true
+  gather_facts: yes
+  
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 0
+      retries: 3
+      delay: 10
+      register: apt_update_result
+      until: apt_update_result is succeeded
+      when: ansible_os_family == "Debian"
+      no_log: true
+
+    - name: Update yum/dnf cache
+      yum:
+        update_cache: yes
+      when: ansible_os_family == "RedHat"
+      no_log: true
+
+    - name: Upgrade base packages
+      apt:
+        upgrade: dist
+        update_cache: yes
+        force: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Fetching and print servers data
+      debug:
+        msg: |
+          IP Address: {{ ansible_default_ipv4.address }}
+          Hostname: {{ ansible_hostname }}
+          OS: {{ ansible_distribution }} {{ ansible_distribution_version }}
+          Kernel: {{ ansible_kernel }}
+          CPU Cores: {{ ansible_processor_cores }}
+          RAM: {{ ansible_memory_mb.real.total }} MB
+          
+    - name: print variable sensitive
+      debug:
+        msg: Hostname:{{ ansible_hostname }}
+      no_log: true
+    
+    
+
+
+      
+      
+
+          
+
+
+   

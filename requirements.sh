@@ -25,44 +25,44 @@ fi
 
 echo "Detected OS: $OS ($OS_FAMILY)"
 
-COMMON_PACKAGES="unzip wget curl jq docker.io"
+COMMON_PACKAGES="unzip wget curl jq docker.io software-properties-common python3 python3-boto3 python3-botocore python3-venv python3-passlib python3-pip"
 
 install_on_debian() {
   wait_for_apt
-  sudo apt-get update -y
+  sudo apt-get update -y > /dev/null
 
   
-  for pkg in $COMMON_PACKAGES software-properties-common python3 python3-boto3 python3-botocore python3-venv python3-passlib python3-pip ; do
+  for pkg in $COMMON_PACKAGES ; do
     if ! dpkg -s "$pkg" >/dev/null 2>&1; then
       echo "Installing missing package: $pkg"
       wait_for_apt
-      sudo apt-get install -y "$pkg"
+      sudo apt-get install -y "$pkg" > /dev/null
     else
       echo "Package $pkg already installed, skipping."
     fi
   done
   sudo add-apt-repository --yes --update ppa:ansible/ansible
-  sudo apt install ansible -y
+  sudo apt install ansible -y >/dev/null 2>&1
   
 
   # AWS CLI v2
   if ! command -v aws >/dev/null 2>&1; then
     echo "Installing AWS CLI v2"
     curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-    unzip -o awscliv2.zip
-    sudo ./aws/install
+    unzip -o awscliv2.zip >/dev/null 2>&1
+    sudo ./aws/install >/dev/null 2>&1
   else
     echo "AWS CLI already installed, updating..."
     curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-    unzip -o awscliv2.zip
-    sudo ./aws/install --update
+    unzip -o awscliv2.zip >/dev/null 2>&1
+    sudo ./aws/install --update >/dev/null 2>&1
   fi
   sudo rm -rf /home/ubuntu/aws
   sudo rm -rf /home/ubuntu/awscliv2.zip
 
   # Python boto3/botocore
   if ! pip show boto3 >/dev/null 2>&1; then
-    pip install boto3 botocore
+    pip install boto3 botocore > /dev/null
   else
     echo "Python boto3/botocore already installed, skipping."
   fi
@@ -79,7 +79,7 @@ install_on_debian() {
     UBUNTU_CODENAME="$(lsb_release -cs || echo 'stable')"
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com ${UBUNTU_CODENAME} main" | sudo tee /etc/apt/sources.list.d/hashicorp.list > /dev/null
     wait_for_apt
-    sudo apt-get update -y
+    sudo apt-get update -y > /dev/null
   fi
 }
 

@@ -34,7 +34,18 @@ provider "aws" {
   }
 }
 
-
+provider "aws" {
+  alias   = "ohio-useast-2"
+  region  = "us-east-2"
+  profile = "optum"
+  default_tags {
+    tags = {
+      Process = "Medica"
+      Cient   = "OPTUM"
+      Project = "ansible-aws-ec2plugin"
+    }
+  }
+}
 
 provider "azurerm" {
   features {}

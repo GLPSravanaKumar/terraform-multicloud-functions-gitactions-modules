@@ -33,7 +33,7 @@ resource "null_resource" "configure_server" {
   } */
 
   # Upload inventory file to controller
-  provisioner "file" {
+  /* provisioner "file" {
     source      = pathexpand("ansible")
     destination = "${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible"
 
@@ -43,7 +43,7 @@ resource "null_resource" "configure_server" {
       private_key = length(var.private_key) > 0 ? var.private_key : file(pathexpand("~/.ssh/id_ed25519_glpskumar"))
       host        = element(module.aws_ec2_ansible-controller.public_server_ip, count.index)
     }
-  }
+  } */
 
   provisioner "remote-exec" {
     inline = [
@@ -62,6 +62,7 @@ resource "null_resource" "configure_server" {
       "chmod 600 ~/.ssh/id_ed25519_glpskumar",
       #      "echo 'IdentityFile ~/id_ed25519_glpskumar' >> ~/.ssh/config",
 
+      /*
       # Ensure Ansible uses the correct key
       "export ANSIBLE_PRIVATE_KEY_FILE=/home/ubuntu/.ssh/id_ed25519_glpskumar",
       "export ANSIBLE_CONFIG=/home/ubuntu/ansible/ansible.cfg",
@@ -74,14 +75,16 @@ resource "null_resource" "configure_server" {
 
       "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/inventory_file.ini install_packages.yml",
 
-      /* 
+      
       "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/inventories/dev/dev_hosts.ini ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/playbooks/dev.yml",
 
       "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/inventories/test/test_hosts.ini ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/playbooks/test.yml",
 
       "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/inventories/qa/qa_hosts.ini ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/playbooks/qa.yml",
 
-      "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/inventory_file.ini gather_facts.yml" */
+      "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/inventory_file.ini gather_facts.yml" 
+
+      "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${var.ami == "ubuntu" ? "/home/ubuntu" : "/home/ec2-user"}/ansible/aws_ec2.yml /home/ubuntu/ansible/tasks/6.jenkins_setup/install_jenkins.yml" */
 
     ]
 

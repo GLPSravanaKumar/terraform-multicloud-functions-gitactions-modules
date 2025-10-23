@@ -191,6 +191,15 @@ module "aws_vpc" {
   vpc_cidr_block = var.vpc_cidr_block
   department     = title(var.department)
 }
+/* module "aws_vpc_useast2" {
+  source         = "./modules/aws_vpc"
+  vpc_cidr_block = var.vpc_cidr_block
+  department     = title(var.department)
+  providers = {
+    aws = aws.ohio-useast-2 # new region (us-west-2)
+  }
+} */
+
 module "aws_igw" {
   source     = "./modules/aws_igw"
   vpc_id     = module.aws_vpc.vpc_id
